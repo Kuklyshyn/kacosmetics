@@ -33,17 +33,12 @@
 		</div>
 
 		<div class="mobile-menu-content">
-			<!-- Featured Banner -->
-			<div class="mobile-menu-banner">
-				<a href="<?php echo home_url('/new-arrivals'); ?>">
-					<?php bloginfo('name'); ?>: the new Lip Glow Oil and fragrances
-				</a>
-			</div>
+			
 
 			<!-- Main Navigation -->
 			<nav class="mobile-menu-nav">
 				<ul>
-					<li><a href="<?php echo home_url('/news'); ?>" class="menu-item-link">News</a></li>
+					
 
 					<?php
 					// Get main product categories
@@ -84,6 +79,45 @@
 					endforeach;
 					?>
 
+					<?php
+					// Get Brands (check multiple possible taxonomies)
+					$brand_taxonomies = array('product_brand', 'yith_product_brand', 'pwb-brand');
+					$brands = array();
+					$brand_taxonomy = '';
+
+					foreach ($brand_taxonomies as $taxonomy) {
+						if (taxonomy_exists($taxonomy)) {
+							$brand_taxonomy = $taxonomy;
+							$brands = get_terms(array(
+								'taxonomy' => $taxonomy,
+								'hide_empty' => false,
+							));
+							break;
+						}
+					}
+
+					if ($brands && !is_wp_error($brands) && !empty($brands)) :
+						?>
+						<li class="has-submenu">
+							<a href="<?php echo home_url('/brands'); ?>" class="menu-item-link">
+								Brands
+							</a>
+							<button class="submenu-toggle" aria-label="Toggle submenu">
+								<svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+									<path d="M4 2L8 6L4 10" stroke="currentColor" stroke-width="1.5"/>
+								</svg>
+							</button>
+							<ul class="submenu">
+								<li><a href="<?php echo home_url('/brands'); ?>">All Brands</a></li>
+								<?php foreach ($brands as $brand) : ?>
+									<li><a href="<?php echo get_term_link($brand); ?>"><?php echo esc_html($brand->name); ?></a></li>
+								<?php endforeach; ?>
+							</ul>
+						</li>
+						<?php
+					endif;
+					?>
+
 					<li><a href="<?php echo home_url('/art-of-gifting'); ?>" class="menu-item-link">Art Of Gifting</a></li>
 					<li><a href="<?php echo home_url('/our-commitments'); ?>" class="menu-item-link">Our Commitments</a></li>
 				</ul>
@@ -121,11 +155,7 @@
 		</div>
 	</div>
 
-	<!-- Bottom Tabs (outside sidebar but positioned with it) -->
-	<div class="mobile-menu-tabs">
-		<a href="<?php echo home_url('/fashion'); ?>" class="menu-tab">Fashion & Accessories</a>
-		<a href="<?php echo home_url('/shop'); ?>" class="menu-tab active">Fragrance & Beauty</a>
-	</div>
+	
 
 	<!-- Top Black Banner -->
 	<div class="top-banner">

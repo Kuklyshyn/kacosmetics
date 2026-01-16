@@ -131,6 +131,19 @@ function kacosmetics_widgets_init() {
 			'after_title'   => '</h2>',
 		)
 	);
+
+	// Register Shop Filters Sidebar
+	register_sidebar(
+		array(
+			'name'          => esc_html__( 'Shop Filters', 'kacosmetics' ),
+			'id'            => 'shop-filters',
+			'description'   => esc_html__( 'Add WooCommerce filter widgets here.', 'kacosmetics' ),
+			'before_widget' => '<div id="%1$s" class="widget %2$s">',
+			'after_widget'  => '</div>',
+			'before_title'  => '<h4 class="widget-title">',
+			'after_title'   => '</h4>',
+		)
+	);
 }
 add_action( 'widgets_init', 'kacosmetics_widgets_init' );
 
@@ -149,9 +162,14 @@ function kacosmetics_scripts() {
 	// Enqueue banner script
 	wp_enqueue_script( 'kacosmetics-banner', get_template_directory_uri() . '/js/banner.js', array(), _S_VERSION, true );
 
-	// Enqueue category tabs script for front page and New Arrivals template
-	if ( is_front_page() || is_page_template( 'template-new-arrivals.php' ) ) {
+	// Enqueue category tabs script for front page, New Arrivals template, shop page, category pages, and brand pages
+	if ( is_front_page() || is_page_template( 'template-new-arrivals.php' ) || is_shop() || is_post_type_archive( 'product' ) || is_product_category() || is_tax( 'product_brand' ) ) {
 		wp_enqueue_script( 'kacosmetics-category-tabs', get_template_directory_uri() . '/js/category-tabs.js', array(), _S_VERSION, true );
+	}
+
+	// Enqueue shop filters script for shop page, category pages, and brand pages
+	if ( is_shop() || is_post_type_archive( 'product' ) || is_product_category() || is_tax( 'product_brand' ) ) {
+		wp_enqueue_script( 'kacosmetics-shop-filters', get_template_directory_uri() . '/js/shop-filters.js', array(), _S_VERSION, true );
 	}
 
 	if ( is_singular() && comments_open() && get_option( 'thread_comments' ) ) {
