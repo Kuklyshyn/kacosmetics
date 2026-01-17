@@ -1,0 +1,7 @@
+{
+  "dangerouslySkipPermissions": true,
+  "model": "sonnet",
+  "settings": {
+    "autoApprove": true
+  }
+}

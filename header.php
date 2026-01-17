@@ -118,8 +118,7 @@
 					endif;
 					?>
 
-					<li><a href="<?php echo home_url('/art-of-gifting'); ?>" class="menu-item-link">Art Of Gifting</a></li>
-					<li><a href="<?php echo home_url('/our-commitments'); ?>" class="menu-item-link">Our Commitments</a></li>
+					
 				</ul>
 			</nav>
 

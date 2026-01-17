@@ -9,7 +9,7 @@
 
 if ( ! defined( '_S_VERSION' ) ) {
 	// Replace the version number of the theme on each release.
-	define( '_S_VERSION', '1.0.0' );
+	define( '_S_VERSION', '1.0.5' );
 }
 
 /**
@@ -172,6 +172,18 @@ function kacosmetics_scripts() {
 		wp_enqueue_script( 'kacosmetics-shop-filters', get_template_directory_uri() . '/js/shop-filters.js', array(), _S_VERSION, true );
 	}
 
+	// Enqueue single product script for product pages
+	if ( is_product() ) {
+		wp_enqueue_script( 'kacosmetics-single-product', get_template_directory_uri() . '/js/single-product.js', array(), _S_VERSION, true );
+	}
+
+	// Enqueue cart script for cart page
+	if ( is_cart() ) {
+		wp_enqueue_script( 'kacosmetics-cart', get_template_directory_uri() . '/js/cart.js', array( 'jquery' ), _S_VERSION, true );
+	}
+
+	
+
 	if ( is_singular() && comments_open() && get_option( 'thread_comments' ) ) {
 		wp_enqueue_script( 'comment-reply' );
 	}
@@ -216,3 +228,41 @@ function kacosmetics_add_woocommerce_support() {
 }
 add_action( 'after_setup_theme', 'kacosmetics_add_woocommerce_support' );
 
+/**
+ * Change number of related products output
+ */
+function kacosmetics_related_products_args( $args ) {
+	$args['posts_per_page'] = 4;
+	$args['columns'] = 4;
+	return $args;
+}
+add_filter( 'woocommerce_output_related_products_args', 'kacosmetics_related_products_args' );
+
+/**
+ * Remove default WooCommerce product loop hooks for related products
+ */
+function kacosmetics_customize_related_products() {
+	// Remove sale flash
+	remove_action( 'woocommerce_before_shop_loop_item_title', 'woocommerce_show_product_loop_sale_flash', 10 );
+	// Remove rating
+	remove_action( 'woocommerce_after_shop_loop_item_title', 'woocommerce_template_loop_rating', 5 );
+	// Remove add to cart button
+	remove_action( 'woocommerce_after_shop_loop_item', 'woocommerce_template_loop_add_to_cart', 10 );
+}
+add_action( 'woocommerce_before_template_part', 'kacosmetics_customize_related_products' );
+
+
+
+
+
+
+/**
+ * Add custom body class for cart page
+ */
+function kacosmetics_cart_body_class( $classes ) {
+	if ( is_cart() ) {
+		$classes[] = 'kacosmetics-cart-page';
+	}
+	return $classes;
+}
+add_filter( 'body_class', 'kacosmetics_cart_body_class' );
