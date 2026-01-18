@@ -177,12 +177,23 @@ function kacosmetics_scripts() {
 		wp_enqueue_script( 'kacosmetics-single-product', get_template_directory_uri() . '/js/single-product.js', array(), _S_VERSION, true );
 	}
 
-	// Enqueue cart script for cart page
+	// Enqueue cart styles and script for cart page
 	if ( is_cart() ) {
+		wp_enqueue_style( 'kacosmetics-cart-style', get_template_directory_uri() . '/css/cart-style.css', array(), _S_VERSION );
 		wp_enqueue_script( 'kacosmetics-cart', get_template_directory_uri() . '/js/cart.js', array( 'jquery' ), _S_VERSION, true );
 	}
 
-	
+	// Enqueue checkout styles for checkout page
+	if ( is_checkout() ) {
+		wp_enqueue_style( 'kacosmetics-checkout-style', get_template_directory_uri() . '/css/checkout-style.css', array(), _S_VERSION );
+	}
+
+	// Enqueue my account styles for my account page
+	if ( is_account_page() ) {
+		wp_enqueue_style( 'kacosmetics-my-account-style', get_template_directory_uri() . '/css/my-account-style.css', array(), _S_VERSION );
+	}
+
+
 
 	if ( is_singular() && comments_open() && get_option( 'thread_comments' ) ) {
 		wp_enqueue_script( 'comment-reply' );
