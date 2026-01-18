@@ -193,7 +193,9 @@ function kacosmetics_scripts() {
 		wp_enqueue_style( 'kacosmetics-my-account-style', get_template_directory_uri() . '/css/my-account-style.css', array(), _S_VERSION );
 	}
 
-
+	// Enqueue cart dropdown styles and script (global - appears in header on all pages)
+	wp_enqueue_style( 'kacosmetics-cart-dropdown', get_template_directory_uri() . '/css/cart-dropdown.css', array(), _S_VERSION );
+	wp_enqueue_script( 'kacosmetics-cart-dropdown', get_template_directory_uri() . '/js/cart-dropdown.js', array( 'jquery' ), _S_VERSION, true );
 
 	if ( is_singular() && comments_open() && get_option( 'thread_comments' ) ) {
 		wp_enqueue_script( 'comment-reply' );
@@ -277,3 +279,29 @@ function kacosmetics_cart_body_class( $classes ) {
 	return $classes;
 }
 add_filter( 'body_class', 'kacosmetics_cart_body_class' );
+
+/**
+ * AJAX handler for removing item from cart
+ */
+function kacosmetics_remove_from_cart() {
+	if ( isset( $_POST['cart_item_key'] ) ) {
+		$cart_item_key = sanitize_text_field( $_POST['cart_item_key'] );
+
+		if ( WC()->cart->remove_cart_item( $cart_item_key ) ) {
+			wp_send_json_success( array(
+				'message' => 'Item removed from cart',
+				'cart_count' => WC()->cart->get_cart_contents_count()
+			) );
+		} else {
+			wp_send_json_error( array(
+				'message' => 'Failed to remove item from cart'
+			) );
+		}
+	} else {
+		wp_send_json_error( array(
+			'message' => 'Invalid cart item key'
+		) );
+	}
+}
+add_action( 'wp_ajax_remove_from_cart', 'kacosmetics_remove_from_cart' );
+add_action( 'wp_ajax_nopriv_remove_from_cart', 'kacosmetics_remove_from_cart' );

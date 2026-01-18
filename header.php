@@ -201,15 +201,83 @@
 							<path d="M4 18C4 14.6863 6.68629 12 10 12C13.3137 12 16 14.6863 16 18" stroke="currentColor" stroke-width="1.5"/>
 						</svg>
 					</a>
-					<a href="<?php echo wc_get_cart_url(); ?>" class="cart-icon" aria-label="Cart">
-						<svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-							<path d="M4 6H16L15 15H5L4 6Z" stroke="currentColor" stroke-width="1.5"/>
-							<path d="M7 6V4C7 2.89543 7.89543 2 9 2H11C12.1046 2 13 2.89543 13 4V6" stroke="currentColor" stroke-width="1.5"/>
-						</svg>
+					<div class="cart-icon-wrapper">
+						<a href="<?php echo wc_get_cart_url(); ?>" class="cart-icon" aria-label="Cart">
+							<svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+								<path d="M4 6H16L15 15H5L4 6Z" stroke="currentColor" stroke-width="1.5"/>
+								<path d="M7 6V4C7 2.89543 7.89543 2 9 2H11C12.1046 2 13 2.89543 13 4V6" stroke="currentColor" stroke-width="1.5"/>
+							</svg>
+							<?php if ( function_exists('WC') && WC()->cart->get_cart_contents_count() > 0 ) : ?>
+								<span class="cart-count"><?php echo WC()->cart->get_cart_contents_count(); ?></span>
+							<?php endif; ?>
+						</a>
+
 						<?php if ( function_exists('WC') && WC()->cart->get_cart_contents_count() > 0 ) : ?>
-							<span class="cart-count"><?php echo WC()->cart->get_cart_contents_count(); ?></span>
+							<div class="mini-cart-dropdown">
+								<div class="mini-cart-header">
+									<h3>Your Cart <span class="mini-cart-count">(<?php echo WC()->cart->get_cart_contents_count(); ?> items)</span></h3>
+								</div>
+
+								<div class="mini-cart-items">
+									<?php foreach ( WC()->cart->get_cart() as $cart_item_key => $cart_item ) :
+										$_product = apply_filters( 'woocommerce_cart_item_product', $cart_item['data'], $cart_item, $cart_item_key );
+										$product_id = apply_filters( 'woocommerce_cart_item_product_id', $cart_item['product_id'], $cart_item, $cart_item_key );
+
+										if ( $_product && $_product->exists() && $cart_item['quantity'] > 0 && apply_filters( 'woocommerce_cart_item_visible', true, $cart_item, $cart_item_key ) ) :
+											$product_permalink = apply_filters( 'woocommerce_cart_item_permalink', $_product->is_visible() ? $_product->get_permalink( $cart_item ) : '', $cart_item, $cart_item_key );
+											?>
+											<div class="mini-cart-item">
+												<div class="mini-cart-item-image">
+													<?php
+													$thumbnail = apply_filters( 'woocommerce_cart_item_thumbnail', $_product->get_image(), $cart_item, $cart_item_key );
+													if ( ! $product_permalink ) {
+														echo $thumbnail;
+													} else {
+														printf( '<a href="%s">%s</a>', esc_url( $product_permalink ), $thumbnail );
+													}
+													?>
+												</div>
+
+												<div class="mini-cart-item-details">
+													<a href="<?php echo esc_url( $product_permalink ); ?>" class="mini-cart-item-name">
+														<?php echo wp_kses_post( apply_filters( 'woocommerce_cart_item_name', $_product->get_name(), $cart_item, $cart_item_key ) ); ?>
+													</a>
+
+													<div class="mini-cart-item-meta">
+														<span class="mini-cart-item-quantity">Qty: <?php echo $cart_item['quantity']; ?></span>
+														<span class="mini-cart-item-price">
+															<?php echo apply_filters( 'woocommerce_cart_item_price', WC()->cart->get_product_price( $_product ), $cart_item, $cart_item_key ); ?>
+														</span>
+													</div>
+												</div>
+
+												<a href="<?php echo esc_url( wc_get_cart_remove_url( $cart_item_key ) ); ?>"
+												   class="mini-cart-item-remove"
+												   aria-label="Remove this item"
+												   data-product_id="<?php echo esc_attr( $product_id ); ?>"
+												   data-cart_item_key="<?php echo esc_attr( $cart_item_key ); ?>">
+													×
+												</a>
+											</div>
+											<?php
+										endif;
+									endforeach; ?>
+								</div>
+
+								<div class="mini-cart-footer">
+									<div class="mini-cart-subtotal">
+										<span class="mini-cart-subtotal-label">Subtotal:</span>
+										<span class="mini-cart-subtotal-amount"><?php echo WC()->cart->get_cart_subtotal(); ?></span>
+									</div>
+
+									<div class="mini-cart-buttons">
+										<a href="<?php echo wc_get_cart_url(); ?>" class="mini-cart-button mini-cart-view-cart">View Cart</a>
+										<a href="<?php echo wc_get_checkout_url(); ?>" class="mini-cart-button mini-cart-checkout">Checkout</a>
+									</div>
+								</div>
+							</div>
 						<?php endif; ?>
-					</a>
+					</div>
 				</div>
 			</div><!-- .header-main -->
 		</div><!-- .header-container -->
