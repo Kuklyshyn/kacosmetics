@@ -239,6 +239,7 @@ button,
 [type="reset"],
 [type="submit"] {
   -webkit-appearance: button;
+  appearance: button;
 }
 
 /**
@@ -322,6 +323,7 @@ textarea {
  */
 [type="search"] {
   -webkit-appearance: textfield;
+  appearance: textfield;
   outline-offset: -2px;
 }
 
@@ -637,6 +639,18 @@ select {
 
 textarea {
   width: 100%;
+}
+
+/* Hide number input spinners */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
 }
 
 /*--------------------------------------------------------------
@@ -2309,7 +2323,7 @@ body.mobile-menu-open {
 .product-add-to-cart .cart {
   display: flex;
   gap: 15px;
-  align-items: flex-start;
+  align-items: center;
   flex-wrap: wrap;
 }
 
@@ -2327,6 +2341,14 @@ body.mobile-menu-open {
   padding: 15px 10px;
   font-size: 16px;
   background: transparent;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.product-add-to-cart .quantity input::-webkit-outer-spin-button,
+.product-add-to-cart .quantity input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 .product-add-to-cart .quantity input:focus {

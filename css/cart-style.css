@@ -149,6 +149,7 @@
 	font-size: 14px;
 	background: transparent;
 	-moz-appearance: textfield;
+	appearance: textfield;
 }
 
 .woocommerce-cart table.cart .quantity input::-webkit-outer-spin-button,
