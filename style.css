@@ -3384,3 +3384,28 @@ html {
 	height: auto;
 	border-radius: 2px;
 }
+
+/* WooCommerce Price Filter */
+.wc-block-price-filter__range-text,
+.wc-block-components-price-slider__range-text {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 10px;
+	margin-top: 10px;
+}
+.wc-block-price-filter__range-text .wc-block-formatted-money-amount,
+.wc-block-components-price-slider__range-text .wc-block-formatted-money-amount {
+	font-weight: 500;
+}
+.wp-block-woocommerce-price-filter {
+	margin-bottom: 20px;
+}
+.wc-block-price-filter__controls,
+.wc-block-components-price-slider__controls {
+	margin-top: 15px;
+}
+
+.widget_price_filter .price_slider_amount {
+  flex-direction: column-reverse;
+}

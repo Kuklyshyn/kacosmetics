@@ -103,6 +103,12 @@ function kac_custom_translations( $translated, $text, $domain ) {
 			'Update cart'        => 'Оновити кошик',
 			'Cart totals'        => 'Підсумки кошика',
 			'Proceed to checkout' => 'Перейти до оформлення',
+			// Filter
+			'Price'              => 'Ціна',
+			'PRICE'              => 'ЦІНА',
+			'Filter'             => 'Фільтр',
+			'FILTER'             => 'ФІЛЬТР',
+			'Filter by price'    => 'Фільтрувати за ціною',
 		);
 		if ( isset( $translations[ $text ] ) ) {
 			return $translations[ $text ];
@@ -123,6 +129,9 @@ function kac_translate_wc_block_strings( $content ) {
 			'Add coupons'     => 'Додати купон',
 			'Free shipping'   => 'Безкоштовна доставка',
 			'Estimated total' => 'Орієнтовна сума',
+			'PRICE'           => 'ЦІНА',
+			'Price'           => 'Ціна',
+			'>Price<'         => '>Ціна<',
 		);
 		$content = str_replace( array_keys( $replacements ), array_values( $replacements ), $content );
 	}
