@@ -1,0 +1,300 @@
+/**
+ * Brands Page Styles
+ * Minimalist design for the All Brands page
+ *
+ * @package kacosmetics
+ */
+
+/* ========================================
+   Page Header
+   ======================================== */
+
+.brands-page {
+  background: #fff;
+}
+
+.brands-page-header {
+  text-align: center;
+  padding: 60px 20px 40px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.brands-page-title {
+  font-size: 2.5rem;
+  font-weight: 300;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin: 0 0 15px;
+  color: #000;
+}
+
+.brands-page-subtitle {
+  font-size: 1rem;
+  font-weight: 300;
+  color: #666;
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ========================================
+   Brands Grid
+   ======================================== */
+
+.brands-grid-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 40px 40px 80px;
+}
+
+.brands-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px;
+}
+
+/* ========================================
+   Brand Card
+   ======================================== */
+
+.brand-card {
+  background: #fff;
+  border: 1px solid #f0f0f0;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease,
+    border-color 0.3s ease;
+  overflow: hidden;
+}
+
+.brand-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+  border-color: #e0e0e0;
+}
+
+.brand-card-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  height: 100%;
+}
+
+/* ========================================
+   Brand Image
+   ======================================== */
+
+.brand-image-wrapper {
+  width: 100%;
+  aspect-ratio: 4/3;
+  overflow: hidden;
+  background: #fafafa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.brand-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 30px;
+  transition: transform 0.3s ease;
+}
+
+.brand-card:hover .brand-image {
+  transform: scale(1.05);
+}
+
+/* Placeholder for brands without images */
+.brand-image-placeholder {
+  background: linear-gradient(135deg, #f8f8f8 0%, #f0f0f0 100%);
+}
+
+.brand-initial {
+  font-size: 4rem;
+  font-weight: 300;
+  color: #ccc;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+}
+
+/* ========================================
+   Brand Info
+   ======================================== */
+
+.brand-info {
+  padding: 30px;
+}
+
+.brand-name {
+  font-size: 1.5rem;
+  font-weight: 400;
+  letter-spacing: 1px;
+  margin: 0 0 12px;
+  color: #000;
+  text-transform: uppercase;
+}
+
+.brand-description {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: #666;
+  margin: 0 0 20px;
+  min-height: 45px;
+}
+
+.brand-meta {
+  margin-bottom: 20px;
+}
+
+.brand-product-count {
+  font-size: 0.85rem;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 300;
+}
+
+/* ========================================
+   View Link
+   ======================================== */
+
+.brand-view-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: #000;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 400;
+  transition: gap 0.3s ease;
+}
+
+.brand-card:hover .brand-view-link {
+  gap: 12px;
+}
+
+.brand-view-link svg {
+  transition: transform 0.3s ease;
+}
+
+.brand-card:hover .brand-view-link svg {
+  transform: translateX(3px);
+}
+
+/* ========================================
+   Empty State
+   ======================================== */
+
+.no-brands-message {
+  text-align: center;
+  padding: 80px 20px;
+  color: #999;
+}
+
+.no-brands-message p {
+  font-size: 1.1rem;
+  font-weight: 300;
+  margin: 0;
+}
+
+/* ========================================
+   Responsive Design
+   ======================================== */
+
+/* Tablet (768px - 1024px) */
+@media screen and (max-width: 1024px) {
+  .brands-page-header {
+    padding: 50px 20px 30px;
+  }
+
+  .brands-page-title {
+    font-size: 2rem;
+  }
+
+  .brands-page-subtitle {
+    font-size: 0.95rem;
+  }
+
+  .brands-grid-container {
+    padding: 30px 30px 60px;
+  }
+
+  .brands-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+  }
+
+  .brand-info {
+    padding: 25px;
+  }
+
+  .brand-name {
+    font-size: 1.3rem;
+  }
+}
+
+/* Mobile (max-width: 767px) */
+@media screen and (max-width: 767px) {
+  .brands-page-header {
+    padding: 40px 20px 25px;
+  }
+
+  .brands-page-title {
+    font-size: 1.75rem;
+    letter-spacing: 1px;
+  }
+
+  .brands-page-subtitle {
+    font-size: 0.9rem;
+  }
+
+  .brands-grid-container {
+    padding: 25px 20px 50px;
+  }
+
+  .brands-grid {
+    grid-template-columns: 1fr;
+    gap: 25px;
+  }
+
+  .brand-info {
+    padding: 20px;
+  }
+
+  .brand-name {
+    font-size: 1.2rem;
+  }
+
+  .brand-description {
+    font-size: 0.85rem;
+    min-height: auto;
+  }
+
+  .brand-initial {
+    font-size: 3rem;
+  }
+
+  .brand-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  }
+}
+
+/* Small Mobile (max-width: 480px) */
+@media screen and (max-width: 480px) {
+  .brands-page-title {
+    font-size: 1.5rem;
+  }
+
+  .brand-name {
+    font-size: 1.1rem;
+  }
+
+  .brand-view-link {
+    font-size: 0.85rem;
+  }
+}

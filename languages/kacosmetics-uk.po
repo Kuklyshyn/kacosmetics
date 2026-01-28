@@ -1,0 +1,147 @@
+# Ukrainian translations for kacosmetics theme
+# Copyright (C) 2024 kacosmetics
+# This file is distributed under the same license as the kacosmetics package.
+msgid ""
+msgstr ""
+"Project-Id-Version: kacosmetics 1.0.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-01-28 12:00+0000\n"
+"PO-Revision-Date: 2024-01-28 12:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: Ukrainian\n"
+"Language: uk\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : 2);\n"
+
+#: header.php
+msgid "Skip to content"
+msgstr "Перейти до вмісту"
+
+#: header.php
+msgid "Shop"
+msgstr "Магазин"
+
+#: header.php
+msgid "Brands"
+msgstr "Бренди"
+
+#: header.php
+msgid "MY ACCOUNT"
+msgstr "МІЙ АКАУНТ"
+
+#: header.php
+msgid "My Account"
+msgstr "Мій акаунт"
+
+#: header.php
+msgid "Logout"
+msgstr "Вийти"
+
+#: header.php
+msgid "Sign In"
+msgstr "Увійти"
+
+#: header.php
+msgid "Contact us"
+msgstr "Зв'яжіться з нами"
+
+#: header.php
+msgid "Find a boutique"
+msgstr "Знайти бутік"
+
+#: header.php
+msgid "EXCLUSIVITY: Discover our new collection."
+msgstr "ЕКСКЛЮЗИВ: Відкрийте нашу нову колекцію."
+
+#: header.php
+msgid "Shop now."
+msgstr "Купити зараз."
+
+#: header.php
+msgid "Your Cart"
+msgstr "Ваш кошик"
+
+#: header.php
+msgid "items"
+msgstr "товарів"
+
+#: header.php
+msgid "Qty:"
+msgstr "К-сть:"
+
+#: header.php
+msgid "Subtotal:"
+msgstr "Підсумок:"
+
+#: header.php
+msgid "View Cart"
+msgstr "Переглянути кошик"
+
+#: header.php
+msgid "Checkout"
+msgstr "Оформити замовлення"
+
+#: page-brands.php
+msgid "Our Brands"
+msgstr "Наші бренди"
+
+#: page-brands.php
+msgid "Discover our curated collection of premium beauty brands"
+msgstr "Відкрийте нашу ретельно підібрану колекцію преміальних косметичних брендів"
+
+#: page-brands.php
+msgid "View Collection"
+msgstr "Переглянути колекцію"
+
+#: page-brands.php
+msgid "No brands found at the moment. Please check back later."
+msgstr "Наразі бренди не знайдено. Будь ласка, перевірте пізніше."
+
+#: page-brands.php
+msgid "%s product"
+msgid_plural "%s products"
+msgstr[0] "%s товар"
+msgstr[1] "%s товари"
+msgstr[2] "%s товарів"
+
+#: front-page.php
+msgid "No products found in %s category."
+msgstr "У категорії %s товари не знайдено."
+
+#: general
+msgid "New"
+msgstr "Новинка"
+
+#: general
+msgid "Exclusive"
+msgstr "Ексклюзив"
+
+#: general
+msgid "Search"
+msgstr "Пошук"
+
+#: general
+msgid "Menu"
+msgstr "Меню"
+
+#: general
+msgid "Close menu"
+msgstr "Закрити меню"
+
+#: general
+msgid "Close banner"
+msgstr "Закрити банер"
+
+#: general
+msgid "Account"
+msgstr "Акаунт"
+
+#: general
+msgid "Cart"
+msgstr "Кошик"
+
+#: general
+msgid "Remove this item"
+msgstr "Видалити цей товар"

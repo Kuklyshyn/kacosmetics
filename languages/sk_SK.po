@@ -1,0 +1,147 @@
+# Slovak translations for kacosmetics theme
+# Copyright (C) 2024 kacosmetics
+# This file is distributed under the same license as the kacosmetics package.
+msgid ""
+msgstr ""
+"Project-Id-Version: kacosmetics 1.0.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-01-28 12:00+0000\n"
+"PO-Revision-Date: 2024-01-28 12:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: Slovak\n"
+"Language: sk_SK\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+
+#: header.php
+msgid "Skip to content"
+msgstr "Preskočiť na obsah"
+
+#: header.php
+msgid "Shop"
+msgstr "Obchod"
+
+#: header.php
+msgid "Brands"
+msgstr "Značky"
+
+#: header.php
+msgid "MY ACCOUNT"
+msgstr "MÔJ ÚČET"
+
+#: header.php
+msgid "My Account"
+msgstr "Môj účet"
+
+#: header.php
+msgid "Logout"
+msgstr "Odhlásiť sa"
+
+#: header.php
+msgid "Sign In"
+msgstr "Prihlásiť sa"
+
+#: header.php
+msgid "Contact us"
+msgstr "Kontaktujte nás"
+
+#: header.php
+msgid "Find a boutique"
+msgstr "Nájsť butik"
+
+#: header.php
+msgid "EXCLUSIVITY: Discover our new collection."
+msgstr "EXKLUZÍVNE: Objavte našu novú kolekciu."
+
+#: header.php
+msgid "Shop now."
+msgstr "Nakupovať."
+
+#: header.php
+msgid "Your Cart"
+msgstr "Váš košík"
+
+#: header.php
+msgid "items"
+msgstr "položiek"
+
+#: header.php
+msgid "Qty:"
+msgstr "Množstvo:"
+
+#: header.php
+msgid "Subtotal:"
+msgstr "Medzisúčet:"
+
+#: header.php
+msgid "View Cart"
+msgstr "Zobraziť košík"
+
+#: header.php
+msgid "Checkout"
+msgstr "Pokladňa"
+
+#: page-brands.php
+msgid "Our Brands"
+msgstr "Naše značky"
+
+#: page-brands.php
+msgid "Discover our curated collection of premium beauty brands"
+msgstr "Objavte našu starostlivo vybranú kolekciu prémiových kozmetických značiek"
+
+#: page-brands.php
+msgid "View Collection"
+msgstr "Zobraziť kolekciu"
+
+#: page-brands.php
+msgid "No brands found at the moment. Please check back later."
+msgstr "Momentálne neboli nájdené žiadne značky. Skúste to prosím neskôr."
+
+#: page-brands.php
+msgid "%s product"
+msgid_plural "%s products"
+msgstr[0] "%s produkt"
+msgstr[1] "%s produkty"
+msgstr[2] "%s produktov"
+
+#: front-page.php
+msgid "No products found in %s category."
+msgstr "V kategórii %s neboli nájdené žiadne produkty."
+
+#: general
+msgid "New"
+msgstr "Novinka"
+
+#: general
+msgid "Exclusive"
+msgstr "Exkluzívne"
+
+#: general
+msgid "Search"
+msgstr "Hľadať"
+
+#: general
+msgid "Menu"
+msgstr "Menu"
+
+#: general
+msgid "Close menu"
+msgstr "Zavrieť menu"
+
+#: general
+msgid "Close banner"
+msgstr "Zavrieť banner"
+
+#: general
+msgid "Account"
+msgstr "Účet"
+
+#: general
+msgid "Cart"
+msgstr "Košík"
+
+#: general
+msgid "Remove this item"
+msgstr "Odstrániť túto položku"

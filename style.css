@@ -814,6 +814,7 @@ input[type="number"] {
 /* Make sure logo link wraps around logo image. */
 .custom-logo-link {
   display: inline-block;
+  max-width: 100px;
 }
 
 /* Captions
@@ -3348,4 +3349,38 @@ a:hover {
 /* Smooth Scrolling */
 html {
 	scroll-behavior: smooth;
+}
+
+/* Language Switcher */
+.language-switcher {
+	display: flex;
+	align-items: center;
+}
+.lang-list {
+	list-style: none;
+	display: flex;
+	gap: 6px;
+	margin: 0;
+	padding: 0;
+}
+.lang-list li {
+	display: flex;
+	align-items: center;
+}
+.lang-list li a {
+	display: flex;
+	align-items: center;
+	opacity: 0.5;
+	transition: opacity 0.2s;
+}
+.lang-list li.current-lang a {
+	opacity: 1;
+}
+.lang-list li a:hover {
+	opacity: 1;
+}
+.lang-list li a img {
+	width: 20px;
+	height: auto;
+	border-radius: 2px;
 }

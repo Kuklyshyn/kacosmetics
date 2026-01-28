@@ -13,6 +13,126 @@ if ( ! defined( '_S_VERSION' ) ) {
 }
 
 /**
+ * Get language-aware URL for internal pages (Polylang compatible)
+ */
+if ( ! function_exists( 'kac_url' ) ) {
+	function kac_url( $path = '' ) {
+		$base = home_url( '/' );
+		$path = ltrim( $path, '/' );
+
+		// Check if Polylang is active and get current language
+		if ( function_exists( 'pll_current_language' ) ) {
+			$current_lang = pll_current_language();
+			$default_lang = pll_default_language();
+
+			// If not default language (Ukrainian)
+			if ( $current_lang && $current_lang !== $default_lang ) {
+				$base = home_url( '/' . $current_lang . '/' );
+
+				// Add -ua suffix to page slug if path is provided
+				if ( $path && ! empty( $path ) ) {
+					// Remove trailing slash, add suffix, restore slash
+					$path = rtrim( $path, '/' );
+					if ( substr( $path, -3 ) !== '-ua' ) {
+						$path .= '-ua';
+					}
+					$path .= '/';
+				}
+			}
+		}
+
+		return esc_url( $base . $path );
+	}
+}
+
+/**
+ * Make WooCommerce pages work with Polylang translations
+ */
+if ( ! function_exists( 'kac_wc_polylang_page_id' ) ) {
+	function kac_wc_polylang_page_id( $page_id ) {
+		if ( function_exists( 'pll_get_post' ) && $page_id ) {
+			$translated_id = pll_get_post( $page_id );
+			if ( $translated_id ) {
+				return $translated_id;
+			}
+		}
+		return $page_id;
+	}
+	add_filter( 'woocommerce_get_cart_page_id', 'kac_wc_polylang_page_id' );
+	add_filter( 'woocommerce_get_checkout_page_id', 'kac_wc_polylang_page_id' );
+	add_filter( 'woocommerce_get_myaccount_page_id', 'kac_wc_polylang_page_id' );
+	add_filter( 'woocommerce_get_shop_page_id', 'kac_wc_polylang_page_id' );
+	add_filter( 'woocommerce_get_terms_page_id', 'kac_wc_polylang_page_id' );
+}
+
+/**
+ * Force WooCommerce to use Polylang locale
+ */
+function kac_polylang_wc_locale( $locale ) {
+	if ( function_exists( 'pll_current_language' ) ) {
+		$lang = pll_current_language( 'locale' );
+		if ( $lang ) {
+			return $lang;
+		}
+	}
+	return $locale;
+}
+add_filter( 'locale', 'kac_polylang_wc_locale', 100 );
+add_filter( 'plugin_locale', 'kac_polylang_wc_locale', 100 );
+
+/**
+ * Custom translations for WooCommerce strings
+ */
+function kac_custom_translations( $translated, $text, $domain ) {
+	if ( function_exists( 'pll_current_language' ) && pll_current_language() === 'ua' ) {
+		$translations = array(
+			// Various cases
+			'Add coupons'        => 'Додати купон',
+			'Add Coupons'        => 'Додати купон',
+			'ADD COUPONS'        => 'Додати купон',
+			'Free shipping'      => 'Безкоштовна доставка',
+			'Free Shipping'      => 'Безкоштовна доставка',
+			'FREE SHIPPING'      => 'Безкоштовна доставка',
+			'Estimated total'    => 'Орієнтовна сума',
+			'Estimated Total'    => 'Орієнтовна сума',
+			'ESTIMATED TOTAL'    => 'Орієнтовна сума',
+			'Subtotal'           => 'Проміжний підсумок',
+			'Total'              => 'Всього',
+			'Coupon code'        => 'Код купона',
+			'Apply coupon'       => 'Застосувати купон',
+			'Update cart'        => 'Оновити кошик',
+			'Cart totals'        => 'Підсумки кошика',
+			'Proceed to checkout' => 'Перейти до оформлення',
+		);
+		if ( isset( $translations[ $text ] ) ) {
+			return $translations[ $text ];
+		}
+	}
+	return $translated;
+}
+add_filter( 'gettext', 'kac_custom_translations', 999, 3 );
+add_filter( 'gettext_woocommerce', 'kac_custom_translations', 999, 3 );
+add_filter( 'gettext_woo-gutenberg-products-block', 'kac_custom_translations', 999, 3 );
+
+/**
+ * Translate WooCommerce Block strings
+ */
+function kac_translate_wc_block_strings( $content ) {
+	if ( function_exists( 'pll_current_language' ) && pll_current_language() === 'ua' ) {
+		$replacements = array(
+			'Add coupons'     => 'Додати купон',
+			'Free shipping'   => 'Безкоштовна доставка',
+			'Estimated total' => 'Орієнтовна сума',
+		);
+		$content = str_replace( array_keys( $replacements ), array_values( $replacements ), $content );
+	}
+	return $content;
+}
+add_filter( 'the_content', 'kac_translate_wc_block_strings', 999 );
+add_filter( 'render_block', 'kac_translate_wc_block_strings', 999 );
+
+
+/**
  * Sets up theme defaults and registers support for various WordPress features.
  *
  * Note that this function is hooked into the after_setup_theme hook, which
@@ -191,6 +311,11 @@ function kacosmetics_scripts() {
 	// Enqueue my account styles for my account page
 	if ( is_account_page() ) {
 		wp_enqueue_style( 'kacosmetics-my-account-style', get_template_directory_uri() . '/css/my-account-style.css', array(), _S_VERSION );
+	}
+
+	// Enqueue brands page styles
+	if ( is_page_template( 'page-brands.php' ) ) {
+		wp_enqueue_style( 'kacosmetics-brands-style', get_template_directory_uri() . '/css/brands-style.css', array(), _S_VERSION );
 	}
 
 	// Enqueue cart dropdown styles and script (global - appears in header on all pages)

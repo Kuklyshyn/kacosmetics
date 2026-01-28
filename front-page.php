@@ -5,241 +5,110 @@
  * @package kacosmetics
  */
 
-get_header(); ?>
+get_header();
+
+// Get top-level product categories that have products
+$categories = get_terms(array(
+    'taxonomy'   => 'product_cat',
+    'hide_empty' => true,
+    'parent'     => 0,
+    'exclude'    => get_option('default_product_cat'),
+    'orderby'    => 'name',
+    'order'      => 'ASC',
+));
+
+if (is_wp_error($categories)) {
+    $categories = array();
+}
+?>
 
 <div id="primary" class="content-area">
     <main id="main" class="site-main new-arrivals-main">
 
-        <!-- Category Tabs -->
-        <div class="category-tabs-wrapper">
-            <div class="category-tabs">
-                <button class="tab-button active" data-category="accessories">
-                    Accessories
-                </button>
-                <button class="tab-button" data-category="hoodies">
-                    Hoodies
-                </button>
-                <button class="tab-button" data-category="tshirts">
-                    Tshirts
-                </button>
+        <?php if (!empty($categories)) : ?>
+            <!-- Category Tabs -->
+            <div class="category-tabs-wrapper">
+                <div class="category-tabs">
+                    <?php foreach ($categories as $index => $cat) : ?>
+                        <button class="tab-button<?php echo $index === 0 ? ' active' : ''; ?>" data-category="<?php echo esc_attr($cat->slug); ?>">
+                            <?php echo esc_html($cat->name); ?>
+                        </button>
+                    <?php endforeach; ?>
+                </div>
             </div>
-        </div>
 
-        <!-- Products Grid -->
-        <div class="products-container">
-
-            <!-- Accessories Products -->
-            <div class="products-grid active" id="accessories-products">
-                <?php
-                // Query для товарів категорії Accessories
-                $accessories_args = array(
-                    'post_type' => 'product',
-                    'posts_per_page' => 12,
-                    'tax_query' => array(
-                        array(
-                            'taxonomy' => 'product_cat',
-                            'field' => 'slug',
-                            'terms' => 'accessories'
-                        )
-                    ),
-                    'orderby' => 'date',
-                    'order' => 'DESC'
-                );
-                $accessories_query = new WP_Query($accessories_args);
-
-                if ($accessories_query->have_posts()) :
-                    while ($accessories_query->have_posts()) : $accessories_query->the_post();
-                        global $product;
-                        ?>
-                        <div class="product-card">
-                            <div class="product-badges">
-                                <?php if (get_post_meta(get_the_ID(), '_is_new', true)) : ?>
-                                    <span class="badge badge-new">New</span>
-                                <?php endif; ?>
-                                <?php if (get_post_meta(get_the_ID(), '_is_exclusive', true)) : ?>
-                                    <span class="badge badge-exclusive">Exclusive</span>
-                                <?php endif; ?>
-                            </div>
-
-                            <a href="<?php the_permalink(); ?>" class="product-image-link">
-                                <?php if (has_post_thumbnail()) : ?>
-                                    <?php the_post_thumbnail('large', array('class' => 'product-image')); ?>
-                                <?php else : ?>
-                                    <div class="product-image placeholder-image"></div>
-                                <?php endif; ?>
-                            </a>
-
-                            <div class="product-info">
-                                <h3 class="product-title">
-                                    <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
-                                </h3>
-                                <?php if ($product && method_exists($product, 'get_short_description')) : ?>
-                                    <p class="product-description"><?php echo wp_trim_words($product->get_short_description(), 8); ?></p>
-                                <?php endif; ?>
-                                <?php if ($product && method_exists($product, 'get_price_html')) : ?>
-                                    <p class="product-price"><?php echo $product->get_price_html(); ?></p>
-                                <?php endif; ?>
-                            </div>
-
-                            <div class="product-actions">
-                                <button class="product-icon-button quick-shop" data-product-id="<?php echo get_the_ID(); ?>">
-                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                                        <path d="M3 5H13L12 13H4L3 5Z" stroke="currentColor" stroke-width="1"/>
-                                        <path d="M6 5V3C6 2.44772 6.44772 2 7 2H9C9.55228 2 10 2.44772 10 3V5" stroke="currentColor" stroke-width="1"/>
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-                        <?php
-                    endwhile;
-                    wp_reset_postdata();
-                else :
-                    echo '<p class="no-products">No products found in Accessories category.</p>';
-                endif;
+            <!-- Products Grid -->
+            <div class="products-container">
+                <?php foreach ($categories as $index => $cat) :
+                    $products_query = new WP_Query(array(
+                        'post_type'      => 'product',
+                        'posts_per_page' => 12,
+                        'tax_query'      => array(
+                            array(
+                                'taxonomy' => 'product_cat',
+                                'field'    => 'slug',
+                                'terms'    => $cat->slug,
+                            ),
+                        ),
+                        'orderby' => 'date',
+                        'order'   => 'DESC',
+                    ));
                 ?>
-            </div>
-
-            <!-- Hoodies Products -->
-            <div class="products-grid" id="hoodies-products">
-                <?php
-                $hoodies_args = array(
-                    'post_type' => 'product',
-                    'posts_per_page' => 12,
-                    'tax_query' => array(
-                        array(
-                            'taxonomy' => 'product_cat',
-                            'field' => 'slug',
-                            'terms' => 'hoodies'
-                        )
-                    ),
-                    'orderby' => 'date',
-                    'order' => 'DESC'
-                );
-                $hoodies_query = new WP_Query($hoodies_args);
-
-                if ($hoodies_query->have_posts()) :
-                    while ($hoodies_query->have_posts()) : $hoodies_query->the_post();
-                        global $product;
+                    <div class="products-grid<?php echo $index === 0 ? ' active' : ''; ?>" id="<?php echo esc_attr($cat->slug); ?>-products">
+                        <?php if ($products_query->have_posts()) :
+                            while ($products_query->have_posts()) : $products_query->the_post();
+                                global $product;
                         ?>
-                        <div class="product-card">
-                            <div class="product-badges">
-                                <?php if (get_post_meta(get_the_ID(), '_is_new', true)) : ?>
-                                    <span class="badge badge-new">New</span>
-                                <?php endif; ?>
-                                <?php if (get_post_meta(get_the_ID(), '_is_exclusive', true)) : ?>
-                                    <span class="badge badge-exclusive">Exclusive</span>
-                                <?php endif; ?>
-                            </div>
+                                <div class="product-card">
+                                    <div class="product-badges">
+                                        <?php if (get_post_meta(get_the_ID(), '_is_new', true)) : ?>
+                                            <span class="badge badge-new"><?php esc_html_e('New', 'kacosmetics'); ?></span>
+                                        <?php endif; ?>
+                                        <?php if (get_post_meta(get_the_ID(), '_is_exclusive', true)) : ?>
+                                            <span class="badge badge-exclusive"><?php esc_html_e('Exclusive', 'kacosmetics'); ?></span>
+                                        <?php endif; ?>
+                                    </div>
 
-                            <a href="<?php the_permalink(); ?>" class="product-image-link">
-                                <?php if (has_post_thumbnail()) : ?>
-                                    <?php the_post_thumbnail('large', array('class' => 'product-image')); ?>
-                                <?php else : ?>
-                                    <div class="product-image placeholder-image"></div>
-                                <?php endif; ?>
-                            </a>
+                                    <a href="<?php the_permalink(); ?>" class="product-image-link">
+                                        <?php if (has_post_thumbnail()) : ?>
+                                            <?php the_post_thumbnail('large', array('class' => 'product-image')); ?>
+                                        <?php else : ?>
+                                            <div class="product-image placeholder-image"></div>
+                                        <?php endif; ?>
+                                    </a>
 
-                            <div class="product-info">
-                                <h3 class="product-title">
-                                    <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
-                                </h3>
-                                <?php if ($product && method_exists($product, 'get_short_description')) : ?>
-                                    <p class="product-description"><?php echo wp_trim_words($product->get_short_description(), 8); ?></p>
-                                <?php endif; ?>
-                                <?php if ($product && method_exists($product, 'get_price_html')) : ?>
-                                    <p class="product-price"><?php echo $product->get_price_html(); ?></p>
-                                <?php endif; ?>
-                            </div>
+                                    <div class="product-info">
+                                        <h3 class="product-title">
+                                            <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
+                                        </h3>
+                                        <?php if ($product && method_exists($product, 'get_short_description')) : ?>
+                                            <p class="product-description"><?php echo wp_trim_words($product->get_short_description(), 8); ?></p>
+                                        <?php endif; ?>
+                                        <?php if ($product && method_exists($product, 'get_price_html')) : ?>
+                                            <p class="product-price"><?php echo $product->get_price_html(); ?></p>
+                                        <?php endif; ?>
+                                    </div>
 
-                            <div class="product-actions">
-                                <button class="product-icon-button quick-shop" data-product-id="<?php echo get_the_ID(); ?>">
-                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                                        <path d="M3 5H13L12 13H4L3 5Z" stroke="currentColor" stroke-width="1"/>
-                                        <path d="M6 5V3C6 2.44772 6.44772 2 7 2H9C9.55228 2 10 2.44772 10 3V5" stroke="currentColor" stroke-width="1"/>
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
+                                    <div class="product-actions">
+                                        <button class="product-icon-button quick-shop" data-product-id="<?php echo get_the_ID(); ?>">
+                                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                                <path d="M3 5H13L12 13H4L3 5Z" stroke="currentColor" stroke-width="1"/>
+                                                <path d="M6 5V3C6 2.44772 6.44772 2 7 2H9C9.55228 2 10 2.44772 10 3V5" stroke="currentColor" stroke-width="1"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
                         <?php
-                    endwhile;
-                    wp_reset_postdata();
-                else :
-                    echo '<p class="no-products">No products found in Hoodies category.</p>';
-                endif;
-                ?>
-            </div>
-
-            <!-- Tshirts Products -->
-            <div class="products-grid" id="tshirts-products">
-                <?php
-                $tshirts_args = array(
-                    'post_type' => 'product',
-                    'posts_per_page' => 12,
-                    'tax_query' => array(
-                        array(
-                            'taxonomy' => 'product_cat',
-                            'field' => 'slug',
-                            'terms' => 'tshirts'
-                        )
-                    ),
-                    'orderby' => 'date',
-                    'order' => 'DESC'
-                );
-                $tshirts_query = new WP_Query($tshirts_args);
-
-                if ($tshirts_query->have_posts()) :
-                    while ($tshirts_query->have_posts()) : $tshirts_query->the_post();
-                        global $product;
+                            endwhile;
+                            wp_reset_postdata();
+                        else :
                         ?>
-                        <div class="product-card">
-                            <div class="product-badges">
-                                <?php if (get_post_meta(get_the_ID(), '_is_new', true)) : ?>
-                                    <span class="badge badge-new">New</span>
-                                <?php endif; ?>
-                                <?php if (get_post_meta(get_the_ID(), '_is_exclusive', true)) : ?>
-                                    <span class="badge badge-exclusive">Exclusive</span>
-                                <?php endif; ?>
-                            </div>
-
-                            <a href="<?php the_permalink(); ?>" class="product-image-link">
-                                <?php if (has_post_thumbnail()) : ?>
-                                    <?php the_post_thumbnail('large', array('class' => 'product-image')); ?>
-                                <?php else : ?>
-                                    <div class="product-image placeholder-image"></div>
-                                <?php endif; ?>
-                            </a>
-
-                            <div class="product-info">
-                                <h3 class="product-title">
-                                    <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
-                                </h3>
-                                <?php if ($product && method_exists($product, 'get_short_description')) : ?>
-                                    <p class="product-description"><?php echo wp_trim_words($product->get_short_description(), 8); ?></p>
-                                <?php endif; ?>
-                                <?php if ($product && method_exists($product, 'get_price_html')) : ?>
-                                    <p class="product-price"><?php echo $product->get_price_html(); ?></p>
-                                <?php endif; ?>
-                            </div>
-
-                            <div class="product-actions">
-                                <button class="product-icon-button quick-shop" data-product-id="<?php echo get_the_ID(); ?>">
-                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                                        <path d="M3 5H13L12 13H4L3 5Z" stroke="currentColor" stroke-width="1"/>
-                                        <path d="M6 5V3C6 2.44772 6.44772 2 7 2H9C9.55228 2 10 2.44772 10 3V5" stroke="currentColor" stroke-width="1"/>
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-                        <?php
-                    endwhile;
-                    wp_reset_postdata();
-                else :
-                    echo '<p class="no-products">No products found in Tshirts category.</p>';
-                endif;
-                ?>
-            </div>
-
-        </div><!-- .products-container -->
+                            <p class="no-products"><?php printf(esc_html__('No products found in %s category.', 'kacosmetics'), esc_html($cat->name)); ?></p>
+                        <?php endif; ?>
+                    </div>
+                <?php endforeach; ?>
+            </div><!-- .products-container -->
+        <?php endif; ?>
 
     </main><!-- #main -->
 </div><!-- #primary -->
