@@ -3409,3 +3409,21 @@ html {
 .widget_price_filter .price_slider_amount {
   flex-direction: column-reverse;
 }
+
+.header-main {
+  position: relative;
+}
+
+.site-branding {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+}
+
+@media screen and (max-width: 600px) {
+  .site-branding {
+    display: none;
+  }
+}

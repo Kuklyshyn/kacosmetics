@@ -106,6 +106,53 @@ msgstr[0] "%s товар"
 msgstr[1] "%s товари"
 msgstr[2] "%s товарів"
 
+#: taxonomy-product_brand.php
+msgid "product"
+msgid_plural "products"
+msgstr[0] "товар"
+msgstr[1] "товари"
+msgstr[2] "товарів"
+
+#: taxonomy-product_brand.php
+msgid "Sort by:"
+msgstr "Сортувати:"
+
+#: taxonomy-product_brand.php
+msgid "Newest First"
+msgstr "Спочатку нові"
+
+#: taxonomy-product_brand.php
+msgid "Oldest First"
+msgstr "Спочатку старі"
+
+#: taxonomy-product_brand.php
+msgid "Name: A-Z"
+msgstr "Назва: А-Я"
+
+#: taxonomy-product_brand.php
+msgid "Name: Z-A"
+msgstr "Назва: Я-А"
+
+#: taxonomy-product_brand.php
+msgid "Price: Low to High"
+msgstr "Ціна: від низької до високої"
+
+#: taxonomy-product_brand.php
+msgid "Price: High to Low"
+msgstr "Ціна: від високої до низької"
+
+#: taxonomy-product_brand.php
+msgid "No products found"
+msgstr "Товари не знайдено"
+
+#: taxonomy-product_brand.php
+msgid "This brand has no products at the moment. Please check back later."
+msgstr "На даний момент у цього бренду немає товарів. Будь ласка, перевірте пізніше."
+
+#: taxonomy-product_brand.php
+msgid "Sale"
+msgstr "Розпродаж"
+
 #: front-page.php
 msgid "No products found in %s category."
 msgstr "У категорії %s товари не знайдено."

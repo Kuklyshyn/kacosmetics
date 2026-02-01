@@ -81,6 +81,101 @@ add_filter( 'locale', 'kac_polylang_wc_locale', 100 );
 add_filter( 'plugin_locale', 'kac_polylang_wc_locale', 100 );
 
 /**
+ * Force product_brand taxonomy to use "brands" slug for all languages
+ */
+function kac_fix_brand_taxonomy_slug() {
+	global $wp_taxonomies;
+
+	if ( isset( $wp_taxonomies['product_brand'] ) ) {
+		// Override the rewrite slug to be "brands" for all languages
+		$wp_taxonomies['product_brand']->rewrite = array(
+			'slug'         => 'brands',
+			'with_front'   => false,
+			'hierarchical' => false,
+		);
+	}
+}
+add_action( 'init', 'kac_fix_brand_taxonomy_slug', 999 );
+
+/**
+ * Prevent Polylang from translating product_brand taxonomy slug
+ */
+function kac_prevent_brand_slug_translation( $translated_slugs ) {
+	// Remove product_brand from translated slugs so it always uses "brands"
+	if ( isset( $translated_slugs['product_brand'] ) ) {
+		unset( $translated_slugs['product_brand'] );
+	}
+	return $translated_slugs;
+}
+add_filter( 'pll_translated_slugs', 'kac_prevent_brand_slug_translation', 999 );
+
+/**
+ * Force all brand term links to use "brands" slug
+ */
+function kac_fix_brand_term_link( $termlink, $term, $taxonomy ) {
+	if ( $taxonomy === 'product_brand' ) {
+		// Replace any translated slug (značka, бренд, etc) with "brands"
+		$termlink = preg_replace( '#/(značka|бренд|product_brand|product-brand)/#', '/brands/', $termlink );
+	}
+	return $termlink;
+}
+add_filter( 'term_link', 'kac_fix_brand_term_link', 999, 3 );
+
+/**
+ * Flush rewrite rules when needed
+ */
+function kac_fix_brand_rewrite_rules() {
+	$version = '2'; // Increment this to force flush again
+	$current_version = get_option( 'kac_brand_slug_version' );
+
+	// Flush if version changed
+	if ( $current_version !== $version ) {
+		flush_rewrite_rules( false );
+		update_option( 'kac_brand_slug_version', $version );
+	}
+
+	// Flush rewrite rules on admin_init if needed
+	if ( is_admin() && isset( $_GET['page'] ) && $_GET['page'] === 'mlang' ) {
+		flush_rewrite_rules( false );
+	}
+}
+add_action( 'admin_init', 'kac_fix_brand_rewrite_rules' );
+
+/**
+ * Make sure brand taxonomy template is loaded correctly
+ * Handle brand URLs that might be 404 but should work
+ */
+function kac_brand_template_include( $template ) {
+	// Check if this looks like a brand URL
+	$request_uri = $_SERVER['REQUEST_URI'];
+	if ( preg_match( '#/brands/([^/]+)/?$#', $request_uri, $matches ) ) {
+		// Force load the brand taxonomy template
+		$theme_template = locate_template( array( 'taxonomy-product_brand.php' ) );
+		if ( $theme_template ) {
+			// Tell WordPress this is a taxonomy page
+			global $wp_query;
+			$wp_query->is_tax = true;
+			$wp_query->is_archive = true;
+			$wp_query->is_404 = false;
+			status_header( 200 );
+
+			return $theme_template;
+		}
+	}
+
+	// Standard brand taxonomy check
+	if ( is_tax( 'product_brand' ) ) {
+		$theme_template = locate_template( array( 'taxonomy-product_brand.php' ) );
+		if ( $theme_template ) {
+			return $theme_template;
+		}
+	}
+
+	return $template;
+}
+add_filter( 'template_include', 'kac_brand_template_include', 99 );
+
+/**
  * Custom translations for WooCommerce strings
  */
 function kac_custom_translations( $translated, $text, $domain ) {
@@ -325,6 +420,11 @@ function kacosmetics_scripts() {
 	// Enqueue brands page styles
 	if ( is_page_template( 'page-brands.php' ) ) {
 		wp_enqueue_style( 'kacosmetics-brands-style', get_template_directory_uri() . '/css/brands-style.css', array(), _S_VERSION );
+	}
+
+	// Enqueue brand archive styles for brand taxonomy pages
+	if ( is_tax( 'product_brand' ) ) {
+		wp_enqueue_style( 'kacosmetics-brand-archive-style', get_template_directory_uri() . '/css/brand-archive-style.css', array(), _S_VERSION );
 	}
 
 	// Enqueue cart dropdown styles and script (global - appears in header on all pages)

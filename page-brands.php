@@ -32,8 +32,10 @@ $brands = get_terms(array(
             <div class="brands-grid-container">
                 <div class="brands-grid">
                     <?php foreach ($brands as $brand) :
-                        // Get brand link
-                        $brand_link = get_term_link($brand);
+                        // Build brand link manually with correct "brands" slug
+                        // home_url() already includes language prefix, so just add brands/slug
+                        $home_url = home_url('/');
+                        $brand_link = trailingslashit($home_url) . 'brands/' . $brand->slug . '/';
 
                         // Get product count
                         $product_count = $brand->count;
