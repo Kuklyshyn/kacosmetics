@@ -3423,7 +3423,38 @@ html {
 }
 
 @media screen and (max-width: 600px) {
-  .site-branding {
+  .language-switcher {
     display: none;
   }
+}
+
+@media screen and (max-width: 600px) {
+  .site-branding {
+    max-width: 50px;
+  }
+}
+
+.mobile-language-switcher {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.mobile-language-switcher ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+}
+.mobile-language-switcher li {
+  margin: 0;
+  padding: 0;
+}
+.mobile-language-switcher li a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }

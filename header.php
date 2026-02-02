@@ -9,8 +9,10 @@
 <!doctype html>
 <html <?php language_attributes(); ?>>
 <head>
-	<meta charset="<?php bloginfo('charset'); ?>">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta charset="UTF-8">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<link rel="profile" href="https://gmpg.org/xfn/11">
 	<?php wp_head(); ?>
 </head>
@@ -50,6 +52,23 @@
 					<li><a href="<?php echo kac_url('stores/'); ?>"><?php esc_html_e('Find a boutique', 'kacosmetics'); ?></a></li>
 				</ul>
 			</div>
+			<div class="mobile-menu-section">
+				<?php if (function_exists('pll_the_languages')) : ?>
+					<div class="mobile-language-switcher">
+							<?php
+							$languages = pll_the_languages(array(
+								'show_flags' => 1,
+								'show_names' => 0,
+								'echo' => 0,
+								'hide_current' => 0,
+							));
+							if ($languages) {
+								echo '<ul class="lang-list">' . $languages . '</ul>';
+							}
+							?>
+					</div>
+					<?php endif; ?>
+			</div>	
 		</div>
 	</div>
 
