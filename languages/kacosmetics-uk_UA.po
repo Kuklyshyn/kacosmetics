@@ -192,3 +192,111 @@ msgstr "Кошик"
 #: general
 msgid "Remove this item"
 msgstr "Видалити цей товар"
+
+#: page-contact.php
+msgid "Contact Us"
+msgstr "Зв'яжіться з нами"
+
+#: page-contact.php
+msgid "We'd love to hear from you. Get in touch with us!"
+msgstr "Ми раді почути від вас. Зв'яжіться з нами!"
+
+#: page-contact.php
+msgid "Address"
+msgstr "Адреса"
+
+#: page-contact.php
+msgid "Phone"
+msgstr "Телефон"
+
+#: page-contact.php
+msgid "Email"
+msgstr "Електронна пошта"
+
+#: page-contact.php
+msgid "Working Hours"
+msgstr "Години роботи"
+
+#: page-contact.php
+msgid "Send us a Message"
+msgstr "Надішліть нам повідомлення"
+
+#: page-contact.php
+msgid "Name"
+msgstr "Ім'я"
+
+#: page-contact.php
+msgid "Subject"
+msgstr "Тема"
+
+#: page-contact.php
+msgid "Message"
+msgstr "Повідомлення"
+
+#: page-contact.php
+msgid "Send Message"
+msgstr "Надіслати повідомлення"
+
+#: page-contact.php
+msgid "Company Information"
+msgstr "Інформація про компанію"
+
+#: page-contact.php
+msgid "Company Name:"
+msgstr "Назва компанії:"
+
+#: page-contact.php
+msgid "IČO:"
+msgstr "IČO:"
+
+#: page-contact.php
+msgid "DIČ:"
+msgstr "DIČ:"
+
+#: page-contact.php
+msgid "IČ DPH:"
+msgstr "IČ DPH:"
+
+#: page-contact.php
+msgid "Register:"
+msgstr "Реєстр:"
+
+#: functions.php
+msgid "Contact Information"
+msgstr "Контактна інформація"
+
+#: functions.php
+msgid "Phone Number"
+msgstr "Номер телефону"
+
+#: functions.php
+msgid "Email Address"
+msgstr "Адреса електронної пошти"
+
+#: functions.php
+msgid "Company Name"
+msgstr "Назва компанії"
+
+#: functions.php
+msgid "IČO (Company ID)"
+msgstr "IČO (Ідентифікатор компанії)"
+
+#: functions.php
+msgid "DIČ (Tax ID)"
+msgstr "DIČ (Податковий номер)"
+
+#: functions.php
+msgid "IČ DPH (VAT ID)"
+msgstr "IČ DPH (ПДВ номер)"
+
+#: functions.php
+msgid "Company Register"
+msgstr "Реєстр компанії"
+
+#: functions.php
+msgid "Map Latitude"
+msgstr "Широта карти"
+
+#: functions.php
+msgid "Map Longitude"
+msgstr "Довгота карти"

@@ -192,3 +192,111 @@ msgstr "Košík"
 #: general
 msgid "Remove this item"
 msgstr "Odstrániť túto položku"
+
+#: page-contact.php
+msgid "Contact Us"
+msgstr "Kontaktujte nás"
+
+#: page-contact.php
+msgid "We'd love to hear from you. Get in touch with us!"
+msgstr "Radi by sme od vás počuli. Kontaktujte nás!"
+
+#: page-contact.php
+msgid "Address"
+msgstr "Adresa"
+
+#: page-contact.php
+msgid "Phone"
+msgstr "Telefón"
+
+#: page-contact.php
+msgid "Email"
+msgstr "Email"
+
+#: page-contact.php
+msgid "Working Hours"
+msgstr "Otváracie hodiny"
+
+#: page-contact.php
+msgid "Send us a Message"
+msgstr "Pošlite nám správu"
+
+#: page-contact.php
+msgid "Name"
+msgstr "Meno"
+
+#: page-contact.php
+msgid "Subject"
+msgstr "Predmet"
+
+#: page-contact.php
+msgid "Message"
+msgstr "Správa"
+
+#: page-contact.php
+msgid "Send Message"
+msgstr "Odoslať správu"
+
+#: page-contact.php
+msgid "Company Information"
+msgstr "Informácie o spoločnosti"
+
+#: page-contact.php
+msgid "Company Name:"
+msgstr "Názov spoločnosti:"
+
+#: page-contact.php
+msgid "IČO:"
+msgstr "IČO:"
+
+#: page-contact.php
+msgid "DIČ:"
+msgstr "DIČ:"
+
+#: page-contact.php
+msgid "IČ DPH:"
+msgstr "IČ DPH:"
+
+#: page-contact.php
+msgid "Register:"
+msgstr "Register:"
+
+#: functions.php
+msgid "Contact Information"
+msgstr "Kontaktné informácie"
+
+#: functions.php
+msgid "Phone Number"
+msgstr "Telefónne číslo"
+
+#: functions.php
+msgid "Email Address"
+msgstr "Emailová adresa"
+
+#: functions.php
+msgid "Company Name"
+msgstr "Názov spoločnosti"
+
+#: functions.php
+msgid "IČO (Company ID)"
+msgstr "IČO (Identifikátor spoločnosti)"
+
+#: functions.php
+msgid "DIČ (Tax ID)"
+msgstr "DIČ (Daňové číslo)"
+
+#: functions.php
+msgid "IČ DPH (VAT ID)"
+msgstr "IČ DPH (DIČ pre DPH)"
+
+#: functions.php
+msgid "Company Register"
+msgstr "Obchodný register"
+
+#: functions.php
+msgid "Map Latitude"
+msgstr "Zemepisná šírka"
+
+#: functions.php
+msgid "Map Longitude"
+msgstr "Zemepisná dĺžka"

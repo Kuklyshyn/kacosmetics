@@ -274,6 +274,10 @@ msgid "Email Address"
 msgstr "Адреса електронної пошти"
 
 #: functions.php
+msgid "Company Information"
+msgstr "Інформація про компанію"
+
+#: functions.php
 msgid "Company Name"
 msgstr "Назва компанії"
 

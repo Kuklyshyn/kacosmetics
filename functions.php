@@ -427,6 +427,11 @@ function kacosmetics_scripts() {
 		wp_enqueue_style( 'kacosmetics-brand-archive-style', get_template_directory_uri() . '/css/brand-archive-style.css', array(), _S_VERSION );
 	}
 
+	// Enqueue contact page styles
+	if ( is_page_template( 'page-contact.php' ) ) {
+		wp_enqueue_style( 'kacosmetics-contact-style', get_template_directory_uri() . '/css/contact-style.css', array(), _S_VERSION );
+	}
+
 	// Enqueue cart dropdown styles and script (global - appears in header on all pages)
 	wp_enqueue_style( 'kacosmetics-cart-dropdown', get_template_directory_uri() . '/css/cart-dropdown.css', array(), _S_VERSION );
 	wp_enqueue_script( 'kacosmetics-cart-dropdown', get_template_directory_uri() . '/js/cart-dropdown.js', array( 'jquery' ), _S_VERSION, true );
@@ -539,3 +544,195 @@ function kacosmetics_remove_from_cart() {
 }
 add_action( 'wp_ajax_remove_from_cart', 'kacosmetics_remove_from_cart' );
 add_action( 'wp_ajax_nopriv_remove_from_cart', 'kacosmetics_remove_from_cart' );
+
+/**
+ * Add Contact Information Settings to WordPress Customizer
+ */
+function kacosmetics_contact_customizer($wp_customize) {
+	// Add Contact Information Section
+	$wp_customize->add_section('kacosmetics_contact_info', array(
+		'title' => __('Contact Information', 'kacosmetics'),
+		'priority' => 30,
+	));
+
+	// Phone
+	$wp_customize->add_setting('kacosmetics_contact_phone', array(
+		'default' => '+421 123 456 789',
+		'sanitize_callback' => 'sanitize_text_field',
+	));
+	$wp_customize->add_control('kacosmetics_contact_phone', array(
+		'label' => __('Phone Number', 'kacosmetics'),
+		'section' => 'kacosmetics_contact_info',
+		'type' => 'text',
+	));
+
+	// Email
+	$wp_customize->add_setting('kacosmetics_contact_email', array(
+		'default' => 'info@kosmo.sk',
+		'sanitize_callback' => 'sanitize_email',
+	));
+	$wp_customize->add_control('kacosmetics_contact_email', array(
+		'label' => __('Email Address', 'kacosmetics'),
+		'section' => 'kacosmetics_contact_info',
+		'type' => 'email',
+	));
+
+	// Address
+	$wp_customize->add_setting('kacosmetics_contact_address', array(
+		'default' => 'Adresa ulica 123, 811 01 Bratislava, Slovensko',
+		'sanitize_callback' => 'sanitize_textarea_field',
+	));
+	$wp_customize->add_control('kacosmetics_contact_address', array(
+		'label' => __('Address', 'kacosmetics'),
+		'section' => 'kacosmetics_contact_info',
+		'type' => 'textarea',
+	));
+
+	// Working Hours
+	$wp_customize->add_setting('kacosmetics_working_hours', array(
+		'default' => "Pondelok - Piatok: 9:00 - 18:00\nSobota: 10:00 - 14:00\nNedeľa: Zatvorené",
+		'sanitize_callback' => 'sanitize_textarea_field',
+	));
+	$wp_customize->add_control('kacosmetics_working_hours', array(
+		'label' => __('Working Hours', 'kacosmetics'),
+		'section' => 'kacosmetics_contact_info',
+		'type' => 'textarea',
+	));
+
+	// Map Latitude
+	$wp_customize->add_setting('kacosmetics_map_latitude', array(
+		'default' => '48.1486',
+		'sanitize_callback' => 'sanitize_text_field',
+	));
+	$wp_customize->add_control('kacosmetics_map_latitude', array(
+		'label' => __('Map Latitude', 'kacosmetics'),
+		'section' => 'kacosmetics_contact_info',
+		'type' => 'text',
+	));
+
+	// Map Longitude
+	$wp_customize->add_setting('kacosmetics_map_longitude', array(
+		'default' => '17.1077',
+		'sanitize_callback' => 'sanitize_text_field',
+	));
+	$wp_customize->add_control('kacosmetics_map_longitude', array(
+		'label' => __('Map Longitude', 'kacosmetics'),
+		'section' => 'kacosmetics_contact_info',
+		'type' => 'text',
+	));
+
+	// Add Company Information Section
+	$wp_customize->add_section('kacosmetics_company_info', array(
+		'title' => __('Company Information', 'kacosmetics'),
+		'priority' => 31,
+	));
+
+	// Company Name
+	$wp_customize->add_setting('kacosmetics_company_name', array(
+		'default' => 'K&A Cosmetics s.r.o.',
+		'sanitize_callback' => 'sanitize_text_field',
+	));
+	$wp_customize->add_control('kacosmetics_company_name', array(
+		'label' => __('Company Name', 'kacosmetics'),
+		'section' => 'kacosmetics_company_info',
+		'type' => 'text',
+	));
+
+	// IČO
+	$wp_customize->add_setting('kacosmetics_company_ico', array(
+		'default' => '12345678',
+		'sanitize_callback' => 'sanitize_text_field',
+	));
+	$wp_customize->add_control('kacosmetics_company_ico', array(
+		'label' => __('IČO (Company ID)', 'kacosmetics'),
+		'section' => 'kacosmetics_company_info',
+		'type' => 'text',
+	));
+
+	// DIČ
+	$wp_customize->add_setting('kacosmetics_company_dic', array(
+		'default' => '1234567890',
+		'sanitize_callback' => 'sanitize_text_field',
+	));
+	$wp_customize->add_control('kacosmetics_company_dic', array(
+		'label' => __('DIČ (Tax ID)', 'kacosmetics'),
+		'section' => 'kacosmetics_company_info',
+		'type' => 'text',
+	));
+
+	// IČ DPH
+	$wp_customize->add_setting('kacosmetics_company_icdph', array(
+		'default' => 'SK1234567890',
+		'sanitize_callback' => 'sanitize_text_field',
+	));
+	$wp_customize->add_control('kacosmetics_company_icdph', array(
+		'label' => __('IČ DPH (VAT ID)', 'kacosmetics'),
+		'section' => 'kacosmetics_company_info',
+		'type' => 'text',
+	));
+
+	// Company Register
+	$wp_customize->add_setting('kacosmetics_company_register', array(
+		'default' => 'Obchodný register Okresného súdu Bratislava I, oddiel: Sro, vložka č. 12345/B',
+		'sanitize_callback' => 'sanitize_textarea_field',
+	));
+	$wp_customize->add_control('kacosmetics_company_register', array(
+		'label' => __('Company Register', 'kacosmetics'),
+		'section' => 'kacosmetics_company_info',
+		'type' => 'textarea',
+	));
+}
+add_action('customize_register', 'kacosmetics_contact_customizer');
+
+/**
+ * Handle Contact Form Submission
+ */
+function kacosmetics_handle_contact_form() {
+	// Verify nonce
+	if (!isset($_POST['contact_nonce']) || !wp_verify_nonce($_POST['contact_nonce'], 'kacosmetics_contact_form')) {
+		wp_die(__('Security check failed', 'kacosmetics'));
+	}
+
+	// Sanitize form data
+	$name = sanitize_text_field($_POST['contact_name']);
+	$email = sanitize_email($_POST['contact_email']);
+	$phone = sanitize_text_field($_POST['contact_phone']);
+	$subject = sanitize_text_field($_POST['contact_subject']);
+	$message = sanitize_textarea_field($_POST['contact_message']);
+
+	// Validate required fields
+	if (empty($name) || empty($email) || empty($subject) || empty($message)) {
+		wp_redirect(add_query_arg('contact', 'error', wp_get_referer()));
+		exit;
+	}
+
+	// Send email to site admin
+	$to = get_theme_mod('kacosmetics_contact_email', get_option('admin_email'));
+	$email_subject = sprintf(__('Contact Form: %s', 'kacosmetics'), $subject);
+	$email_message = sprintf(
+		__("New contact form submission:\n\nName: %s\nEmail: %s\nPhone: %s\nSubject: %s\n\nMessage:\n%s", 'kacosmetics'),
+		$name,
+		$email,
+		$phone,
+		$subject,
+		$message
+	);
+
+	$headers = array(
+		'From: ' . $name . ' <' . $email . '>',
+		'Reply-To: ' . $email,
+	);
+
+	// Send email
+	$sent = wp_mail($to, $email_subject, $email_message, $headers);
+
+	// Redirect with success or error message
+	if ($sent) {
+		wp_redirect(add_query_arg('contact', 'success', wp_get_referer()));
+	} else {
+		wp_redirect(add_query_arg('contact', 'error', wp_get_referer()));
+	}
+	exit;
+}
+add_action('admin_post_kacosmetics_contact_form', 'kacosmetics_handle_contact_form');
+add_action('admin_post_nopriv_kacosmetics_contact_form', 'kacosmetics_handle_contact_form');
