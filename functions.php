@@ -736,3 +736,40 @@ function kacosmetics_handle_contact_form() {
 }
 add_action('admin_post_kacosmetics_contact_form', 'kacosmetics_handle_contact_form');
 add_action('admin_post_nopriv_kacosmetics_contact_form', 'kacosmetics_handle_contact_form');
+
+/**
+ * Flush rewrite rules for contact page
+ */
+function kac_flush_contact_page_rewrite() {
+	$version = '3'; // Increment to force flush
+	$current = get_option('kac_contact_flush_version');
+	
+	if ($current !== $version) {
+		flush_rewrite_rules(false);
+		update_option('kac_contact_flush_version', $version);
+	}
+}
+add_action('init', 'kac_flush_contact_page_rewrite');
+
+/**
+ * Get Contact Page URL with Polylang support
+ */
+function kac_get_contact_page_url() {
+	// Try to find contact page
+	$contact_page = get_page_by_path('contact');
+	
+	if (!$contact_page) {
+		// Fallback to kac_url
+		return kac_url('contact/');
+	}
+	
+	// Get translated version if Polylang is active
+	if (function_exists('pll_get_post')) {
+		$translated_id = pll_get_post($contact_page->ID);
+		if ($translated_id) {
+			return get_permalink($translated_id);
+		}
+	}
+	
+	return get_permalink($contact_page->ID);
+}

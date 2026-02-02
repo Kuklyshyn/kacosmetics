@@ -46,7 +46,7 @@
 
 			<div class="mobile-menu-section">
 				<ul>
-					<li><a href="<?php echo kac_url('contact/'); ?>"><?php esc_html_e('Contact us', 'kacosmetics'); ?></a></li>
+					<li><a href="<?php echo esc_url(kac_get_contact_page_url()); ?>"><?php esc_html_e('Contact us', 'kacosmetics'); ?></a></li>
 					<li><a href="<?php echo kac_url('stores/'); ?>"><?php esc_html_e('Find a boutique', 'kacosmetics'); ?></a></li>
 				</ul>
 			</div>
