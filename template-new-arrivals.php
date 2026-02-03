@@ -14,13 +14,13 @@ get_header(); ?>
         <div class="category-tabs-wrapper">
             <div class="category-tabs">
                 <button class="tab-button active" data-category="accessories">
-                    Accessories
+                    <?php esc_html_e('Accessories', 'kacosmetics'); ?>
                 </button>
                 <button class="tab-button" data-category="hoodies">
-                    Hoodies
+                    <?php esc_html_e('Hoodies', 'kacosmetics'); ?>
                 </button>
                 <button class="tab-button" data-category="tshirts">
-                    Tshirts
+                    <?php esc_html_e('Tshirts', 'kacosmetics'); ?>
                 </button>
             </div>
         </div>
@@ -54,10 +54,10 @@ get_header(); ?>
                         <div class="product-card">
                             <div class="product-badges">
                                 <?php if (get_post_meta(get_the_ID(), '_is_new', true)) : ?>
-                                    <span class="badge badge-new">New</span>
+                                    <span class="badge badge-new"><?php esc_html_e('New', 'kacosmetics'); ?></span>
                                 <?php endif; ?>
                                 <?php if (get_post_meta(get_the_ID(), '_is_exclusive', true)) : ?>
-                                    <span class="badge badge-exclusive">Exclusive</span>
+                                    <span class="badge badge-exclusive"><?php esc_html_e('Exclusive', 'kacosmetics'); ?></span>
                                 <?php endif; ?>
                             </div>
 
@@ -78,13 +78,13 @@ get_header(); ?>
                                 <?php endif; ?>
                             </div>
 
-                            <a href="<?php the_permalink(); ?>" class="product-button">Buy</a>
+                            <a href="<?php the_permalink(); ?>" class="product-button"><?php esc_html_e('Buy', 'kacosmetics'); ?></a>
                         </div>
                         <?php
                     endwhile;
                     wp_reset_postdata();
                 else :
-                    echo '<p class="no-products">No products found in Accessories category.</p>';
+                    echo '<p class="no-products">' . sprintf(esc_html__('No products found in %s category.', 'kacosmetics'), 'Accessories') . '</p>';
                 endif;
                 ?>
             </div>
@@ -114,10 +114,10 @@ get_header(); ?>
                         <div class="product-card">
                             <div class="product-badges">
                                 <?php if (get_post_meta(get_the_ID(), '_is_new', true)) : ?>
-                                    <span class="badge badge-new">New</span>
+                                    <span class="badge badge-new"><?php esc_html_e('New', 'kacosmetics'); ?></span>
                                 <?php endif; ?>
                                 <?php if (get_post_meta(get_the_ID(), '_is_exclusive', true)) : ?>
-                                    <span class="badge badge-exclusive">Exclusive</span>
+                                    <span class="badge badge-exclusive"><?php esc_html_e('Exclusive', 'kacosmetics'); ?></span>
                                 <?php endif; ?>
                             </div>
 
@@ -138,13 +138,13 @@ get_header(); ?>
                                 <?php endif; ?>
                             </div>
 
-                            <a href="<?php the_permalink(); ?>" class="product-button">Buy</a>
+                            <a href="<?php the_permalink(); ?>" class="product-button"><?php esc_html_e('Buy', 'kacosmetics'); ?></a>
                         </div>
                         <?php
                     endwhile;
                     wp_reset_postdata();
                 else :
-                    echo '<p class="no-products">No products found in Hoodies category.</p>';
+                    echo '<p class="no-products">' . sprintf(esc_html__('No products found in %s category.', 'kacosmetics'), 'Hoodies') . '</p>';
                 endif;
                 ?>
             </div>
@@ -174,10 +174,10 @@ get_header(); ?>
                         <div class="product-card">
                             <div class="product-badges">
                                 <?php if (get_post_meta(get_the_ID(), '_is_new', true)) : ?>
-                                    <span class="badge badge-new">New</span>
+                                    <span class="badge badge-new"><?php esc_html_e('New', 'kacosmetics'); ?></span>
                                 <?php endif; ?>
                                 <?php if (get_post_meta(get_the_ID(), '_is_exclusive', true)) : ?>
-                                    <span class="badge badge-exclusive">Exclusive</span>
+                                    <span class="badge badge-exclusive"><?php esc_html_e('Exclusive', 'kacosmetics'); ?></span>
                                 <?php endif; ?>
                             </div>
 
@@ -198,13 +198,13 @@ get_header(); ?>
                                 <?php endif; ?>
                             </div>
 
-                            <a href="<?php the_permalink(); ?>" class="product-button">Buy</a>
+                            <a href="<?php the_permalink(); ?>" class="product-button"><?php esc_html_e('Buy', 'kacosmetics'); ?></a>
                         </div>
                         <?php
                     endwhile;
                     wp_reset_postdata();
                 else :
-                    echo '<p class="no-products">No products found in Tshirts category.</p>';
+                    echo '<p class="no-products">' . sprintf(esc_html__('No products found in %s category.', 'kacosmetics'), 'Tshirts') . '</p>';
                 endif;
                 ?>
             </div>

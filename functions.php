@@ -179,34 +179,68 @@ add_filter( 'template_include', 'kac_brand_template_include', 99 );
  * Custom translations for WooCommerce strings
  */
 function kac_custom_translations( $translated, $text, $domain ) {
-	if ( function_exists( 'pll_current_language' ) && pll_current_language() === 'ua' ) {
-		$translations = array(
-			// Various cases
-			'Add coupons'        => 'Додати купон',
-			'Add Coupons'        => 'Додати купон',
-			'ADD COUPONS'        => 'Додати купон',
-			'Free shipping'      => 'Безкоштовна доставка',
-			'Free Shipping'      => 'Безкоштовна доставка',
-			'FREE SHIPPING'      => 'Безкоштовна доставка',
-			'Estimated total'    => 'Орієнтовна сума',
-			'Estimated Total'    => 'Орієнтовна сума',
-			'ESTIMATED TOTAL'    => 'Орієнтовна сума',
-			'Subtotal'           => 'Проміжний підсумок',
-			'Total'              => 'Всього',
-			'Coupon code'        => 'Код купона',
-			'Apply coupon'       => 'Застосувати купон',
-			'Update cart'        => 'Оновити кошик',
-			'Cart totals'        => 'Підсумки кошика',
-			'Proceed to checkout' => 'Перейти до оформлення',
-			// Filter
-			'Price'              => 'Ціна',
-			'PRICE'              => 'ЦІНА',
-			'Filter'             => 'Фільтр',
-			'FILTER'             => 'ФІЛЬТР',
-			'Filter by price'    => 'Фільтрувати за ціною',
-		);
-		if ( isset( $translations[ $text ] ) ) {
-			return $translations[ $text ];
+	if ( function_exists( 'pll_current_language' ) ) {
+		$lang = pll_current_language();
+
+		if ( $lang === 'ua' ) {
+			$translations = array(
+				// Various cases
+				'Add coupons'        => 'Додати купон',
+				'Add Coupons'        => 'Додати купон',
+				'ADD COUPONS'        => 'Додати купон',
+				'Free shipping'      => 'Безкоштовна доставка',
+				'Free Shipping'      => 'Безкоштовна доставка',
+				'FREE SHIPPING'      => 'Безкоштовна доставка',
+				'Estimated total'    => 'Орієнтовна сума',
+				'Estimated Total'    => 'Орієнтовна сума',
+				'ESTIMATED TOTAL'    => 'Орієнтовна сума',
+				'Subtotal'           => 'Проміжний підсумок',
+				'Total'              => 'Всього',
+				'Coupon code'        => 'Код купона',
+				'Apply coupon'       => 'Застосувати купон',
+				'Update cart'        => 'Оновити кошик',
+				'Cart totals'        => 'Підсумки кошика',
+				'Proceed to checkout' => 'Перейти до оформлення',
+				// Filter
+				'Price'              => 'Ціна',
+				'PRICE'              => 'ЦІНА',
+				'Filter'             => 'Фільтр',
+				'FILTER'             => 'ФІЛЬТР',
+				'Filter by price'    => 'Фільтрувати за ціною',
+				// Archive / Shop
+				'All Products'       => 'Усі товари',
+				'Filters'            => 'Фільтри',
+				'Categories'         => 'Категорії',
+				'Brands'             => 'Бренди',
+				'New'                => 'Новинка',
+				'Exclusive'          => 'Ексклюзив',
+				'No products found.' => 'Товари не знайдено.',
+				'Buy'                => 'Купити',
+				// Product tabs
+				'Specifications'     => 'Характеристики',
+			);
+			if ( isset( $translations[ $text ] ) ) {
+				return $translations[ $text ];
+			}
+		}
+
+		if ( $lang === 'sk' ) {
+			$translations = array(
+				// Archive / Shop
+				'All Products'       => 'Všetky produkty',
+				'Filters'            => 'Filtre',
+				'Categories'         => 'Kategórie',
+				'Brands'             => 'Značky',
+				'New'                => 'Novinka',
+				'Exclusive'          => 'Exkluzívne',
+				'No products found.' => 'Neboli nájdené žiadne produkty.',
+				'Buy'                => 'Kúpiť',
+				// Product tabs
+				'Specifications'     => 'Vlastnosti',
+			);
+			if ( isset( $translations[ $text ] ) ) {
+				return $translations[ $text ];
+			}
 		}
 	}
 	return $translated;
@@ -214,6 +248,7 @@ function kac_custom_translations( $translated, $text, $domain ) {
 add_filter( 'gettext', 'kac_custom_translations', 999, 3 );
 add_filter( 'gettext_woocommerce', 'kac_custom_translations', 999, 3 );
 add_filter( 'gettext_woo-gutenberg-products-block', 'kac_custom_translations', 999, 3 );
+add_filter( 'gettext_kacosmetics', 'kac_custom_translations', 999, 3 );
 
 /**
  * Translate WooCommerce Block strings
@@ -479,6 +514,55 @@ function kacosmetics_add_woocommerce_support() {
 	add_theme_support( 'wc-product-gallery-slider' );
 }
 add_action( 'after_setup_theme', 'kacosmetics_add_woocommerce_support' );
+
+/**
+ * Add Specifications tab to product page
+ */
+function kac_specifications_product_tab( $tabs ) {
+	global $product;
+
+	if ( $product && $product->has_attributes() ) {
+		$tabs['specifications'] = array(
+			'title'    => esc_html__( 'Specifications', 'kacosmetics' ),
+			'priority' => 15,
+			'callback' => 'kac_specifications_tab_content',
+		);
+	}
+
+	return $tabs;
+}
+add_filter( 'woocommerce_product_tabs', 'kac_specifications_product_tab' );
+
+function kac_specifications_tab_content() {
+	global $product;
+
+	if ( ! $product ) {
+		return;
+	}
+
+	$attributes = $product->get_attributes();
+
+	if ( ! $attributes ) {
+		return;
+	}
+
+	echo '<table class="shop_attributes specifications-table">';
+	foreach ( $attributes as $attribute ) {
+		$name = wc_attribute_label( $attribute->get_name() );
+
+		if ( $attribute->is_taxonomy() ) {
+			$values = wc_get_product_terms( $product->get_id(), $attribute->get_name(), array( 'fields' => 'names' ) );
+			$value  = implode( ', ', $values );
+		} else {
+			$value = implode( ', ', $attribute->get_options() );
+		}
+
+		if ( $value ) {
+			echo '<tr><th>' . esc_html( $name ) . '</th><td>' . esc_html( $value ) . '</td></tr>';
+		}
+	}
+	echo '</table>';
+}
 
 /**
  * Change number of related products output

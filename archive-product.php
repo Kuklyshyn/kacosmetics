@@ -25,7 +25,7 @@ get_header(); ?>
             <div class="category-tabs-wrapper">
                 <div class="category-tabs">
                     <button class="tab-button active" data-category="all">
-                        All Products
+                        <?php esc_html_e('All Products', 'kacosmetics'); ?>
                     </button>
                     <?php foreach ($product_categories as $index => $category) : ?>
                         <button class="tab-button" data-category="<?php echo esc_attr($category->slug); ?>">
@@ -48,11 +48,11 @@ get_header(); ?>
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                             <path d="M4 6H16M4 10H16M4 14H16" stroke="currentColor" stroke-width="1.5"/>
                         </svg>
-                        Filters
+                        <?php esc_html_e('Filters', 'kacosmetics'); ?>
                     </button>
 
                     <div class="filters-content">
-                        <h3 class="sidebar-title">Filters</h3>
+                        <h3 class="sidebar-title"><?php esc_html_e('Filters', 'kacosmetics'); ?></h3>
 
                         <?php if (is_active_sidebar('shop-filters')) : ?>
                             <?php dynamic_sidebar('shop-filters'); ?>
@@ -61,14 +61,14 @@ get_header(); ?>
                             <!-- Price Filter -->
                             <?php if (class_exists('WC_Widget_Price_Filter')) : ?>
                                 <div class="widget woocommerce widget_price_filter">
-                                    <h4 class="widget-title">Price</h4>
+                                    <h4 class="widget-title"><?php esc_html_e('Price', 'kacosmetics'); ?></h4>
                                     <?php the_widget('WC_Widget_Price_Filter'); ?>
                                 </div>
                             <?php endif; ?>
 
                             <!-- Category Filter -->
                             <div class="widget woocommerce">
-                                <h4 class="widget-title">Categories</h4>
+                                <h4 class="widget-title"><?php esc_html_e('Categories', 'kacosmetics'); ?></h4>
                                 <ul class="product-categories">
                                     <?php
                                     $categories = get_terms(array(
@@ -98,7 +98,7 @@ get_header(); ?>
                             if ($brands && !is_wp_error($brands)) :
                             ?>
                                 <div class="widget woocommerce">
-                                    <h4 class="widget-title">Brands</h4>
+                                    <h4 class="widget-title"><?php esc_html_e('Brands', 'kacosmetics'); ?></h4>
                                     <ul class="product-brands">
                                         <?php foreach ($brands as $brand) : ?>
                                             <li>
@@ -138,10 +138,10 @@ get_header(); ?>
                         <div class="product-card">
                             <div class="product-badges">
                                 <?php if (get_post_meta(get_the_ID(), '_is_new', true)) : ?>
-                                    <span class="badge badge-new">New</span>
+                                    <span class="badge badge-new"><?php esc_html_e('New', 'kacosmetics'); ?></span>
                                 <?php endif; ?>
                                 <?php if (get_post_meta(get_the_ID(), '_is_exclusive', true)) : ?>
-                                    <span class="badge badge-exclusive">Exclusive</span>
+                                    <span class="badge badge-exclusive"><?php esc_html_e('Exclusive', 'kacosmetics'); ?></span>
                                 <?php endif; ?>
                             </div>
 
@@ -178,7 +178,7 @@ get_header(); ?>
                     endwhile;
                     wp_reset_postdata();
                 else :
-                    echo '<p class="no-products">No products found.</p>';
+                    echo '<p class="no-products">' . esc_html__('No products found.', 'kacosmetics') . '</p>';
                 endif;
                 ?>
             </div>
@@ -213,10 +213,10 @@ get_header(); ?>
                                 <div class="product-card">
                                     <div class="product-badges">
                                         <?php if (get_post_meta(get_the_ID(), '_is_new', true)) : ?>
-                                            <span class="badge badge-new">New</span>
+                                            <span class="badge badge-new"><?php esc_html_e('New', 'kacosmetics'); ?></span>
                                         <?php endif; ?>
                                         <?php if (get_post_meta(get_the_ID(), '_is_exclusive', true)) : ?>
-                                            <span class="badge badge-exclusive">Exclusive</span>
+                                            <span class="badge badge-exclusive"><?php esc_html_e('Exclusive', 'kacosmetics'); ?></span>
                                         <?php endif; ?>
                                     </div>
 
@@ -253,7 +253,7 @@ get_header(); ?>
                             endwhile;
                             wp_reset_postdata();
                         else :
-                            echo '<p class="no-products">No products found in ' . esc_html($category->name) . ' category.</p>';
+                            echo '<p class="no-products">' . sprintf(esc_html__('No products found in %s category.', 'kacosmetics'), esc_html($category->name)) . '</p>';
                         endif;
                         ?>
                     </div>
