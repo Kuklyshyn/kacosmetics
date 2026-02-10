@@ -9,7 +9,7 @@
 
 if ( ! defined( '_S_VERSION' ) ) {
 	// Replace the version number of the theme on each release.
-	define( '_S_VERSION', '1.0.5' );
+	define( '_S_VERSION', '1.0.7' );
 }
 
 /**
@@ -218,13 +218,14 @@ function kac_custom_translations( $translated, $text, $domain ) {
 				'Buy'                => 'Купити',
 				// Product tabs
 				'Specifications'     => 'Характеристики',
+				'Composition'        => 'Склад',
 			);
 			if ( isset( $translations[ $text ] ) ) {
 				return $translations[ $text ];
 			}
 		}
 
-		if ( $lang === 'sk' ) {
+		if ( $lang !== 'ua' ) {
 			$translations = array(
 				// Archive / Shop
 				'All Products'       => 'Všetky produkty',
@@ -237,6 +238,7 @@ function kac_custom_translations( $translated, $text, $domain ) {
 				'Buy'                => 'Kúpiť',
 				// Product tabs
 				'Specifications'     => 'Vlastnosti',
+				'Composition'        => 'Zloženie',
 			);
 			if ( isset( $translations[ $text ] ) ) {
 				return $translations[ $text ];
@@ -428,7 +430,18 @@ function kacosmetics_scripts() {
 
 	// Enqueue shop filters script for shop page, category pages, and brand pages
 	if ( is_shop() || is_post_type_archive( 'product' ) || is_product_category() || is_tax( 'product_brand' ) ) {
-		wp_enqueue_script( 'kacosmetics-shop-filters', get_template_directory_uri() . '/js/shop-filters.js', array(), _S_VERSION, true );
+		wp_enqueue_script( 'kacosmetics-shop-filters', get_template_directory_uri() . '/js/shop-filters.js', array( 'jquery' ), _S_VERSION, true );
+
+		// Pass WooCommerce settings to JavaScript
+		if ( function_exists( 'get_woocommerce_currency_symbol' ) ) {
+			wp_localize_script( 'kacosmetics-shop-filters', 'kacShopFilters', array(
+				'currencySymbol'   => get_woocommerce_currency_symbol(),
+				'currencyPosition' => get_option( 'woocommerce_currency_pos', 'left' ),
+				'priceDecimals'    => wc_get_price_decimals(),
+				'decimalSeparator' => wc_get_price_decimal_separator(),
+				'thousandSeparator' => wc_get_price_thousand_separator(),
+			) );
+		}
 	}
 
 	// Enqueue single product script for product pages
@@ -563,6 +576,141 @@ function kac_specifications_tab_content() {
 	}
 	echo '</table>';
 }
+
+/**
+ * Add Composition (Zlozenie) tab to product page
+ */
+function kac_composition_product_tab( $tabs ) {
+	global $product;
+
+	if ( ! $product ) {
+		return $tabs;
+	}
+
+	$composition = kac_get_composition( $product->get_id() );
+
+	if ( ! empty( $composition ) ) {
+		$tabs['composition'] = array(
+			'title'    => esc_html__( 'Composition', 'kacosmetics' ),
+			'priority' => 12, // After description (10), before specifications (15)
+			'callback' => 'kac_composition_tab_content',
+		);
+	}
+
+	return $tabs;
+}
+add_filter( 'woocommerce_product_tabs', 'kac_composition_product_tab' );
+
+/**
+ * Get composition value from various possible meta keys
+ */
+function kac_get_composition( $product_id ) {
+	// Try different possible meta keys
+	$possible_keys = array(
+		'zlozenie',
+		'_zlozenie',
+		'Zlozenie',
+		'_Zlozenie',
+		'Zlozenie(INCI)',
+		'_Zlozenie(INCI)',
+		'zlozenie_inci',
+		'_zlozenie_inci',
+		'composition',
+		'_composition',
+		'ingredients',
+		'_ingredients',
+		'inci',
+		'_inci',
+	);
+
+	foreach ( $possible_keys as $key ) {
+		$value = get_post_meta( $product_id, $key, true );
+		if ( ! empty( $value ) ) {
+			return $value;
+		}
+	}
+
+	return '';
+}
+
+function kac_composition_tab_content() {
+	global $product;
+
+	if ( ! $product ) {
+		return;
+	}
+
+	$composition = kac_get_composition( $product->get_id() );
+
+	if ( ! empty( $composition ) ) {
+		echo '<div class="product-composition">';
+		echo wp_kses_post( wpautop( $composition ) );
+		echo '</div>';
+	}
+}
+
+/**
+ * Add Zlozenie (INCI) field to product edit page in admin
+ */
+function kac_add_zlozenie_field() {
+	global $post;
+
+	echo '<div class="options_group">';
+
+	woocommerce_wp_textarea_input( array(
+		'id'          => 'zlozenie',
+		'label'       => __( 'Zlozenie (INCI)', 'kacosmetics' ),
+		'placeholder' => __( 'Enter product composition/ingredients...', 'kacosmetics' ),
+		'description' => __( 'Product composition or INCI ingredients list. Will be displayed in a separate tab on the product page.', 'kacosmetics' ),
+		'desc_tip'    => true,
+		'rows'        => 5,
+	) );
+
+	echo '</div>';
+}
+add_action( 'woocommerce_product_options_general_product_data', 'kac_add_zlozenie_field' );
+
+/**
+ * Save Zlozenie (INCI) field
+ */
+function kac_save_zlozenie_field( $post_id ) {
+	$zlozenie = isset( $_POST['zlozenie'] ) ? wp_kses_post( $_POST['zlozenie'] ) : '';
+	update_post_meta( $post_id, 'zlozenie', $zlozenie );
+}
+add_action( 'woocommerce_process_product_meta', 'kac_save_zlozenie_field' );
+
+/**
+ * Add Zlozenie field to WooCommerce CSV Import mapping options
+ */
+function kac_add_zlozenie_import_column( $options ) {
+	$options['zlozenie'] = __( 'Zlozenie (INCI)', 'kacosmetics' );
+	return $options;
+}
+add_filter( 'woocommerce_csv_product_import_mapping_options', 'kac_add_zlozenie_import_column' );
+
+/**
+ * Add default column mapping for Zlozenie
+ */
+function kac_add_zlozenie_import_default_column( $columns ) {
+	$columns[ __( 'Zlozenie (INCI)', 'kacosmetics' ) ] = 'zlozenie';
+	$columns['zlozenie'] = 'zlozenie';
+	$columns['Zlozenie'] = 'zlozenie';
+	$columns['Zlozenie(INCI)'] = 'zlozenie';
+	$columns['INCI'] = 'zlozenie';
+	return $columns;
+}
+add_filter( 'woocommerce_csv_product_import_mapping_default_columns', 'kac_add_zlozenie_import_default_column' );
+
+/**
+ * Process Zlozenie field during import
+ */
+function kac_process_zlozenie_import( $object, $data ) {
+	if ( ! empty( $data['zlozenie'] ) ) {
+		$object->update_meta_data( 'zlozenie', wp_kses_post( $data['zlozenie'] ) );
+	}
+	return $object;
+}
+add_filter( 'woocommerce_product_import_pre_insert_product_object', 'kac_process_zlozenie_import', 10, 2 );
 
 /**
  * Change number of related products output

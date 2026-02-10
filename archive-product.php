@@ -66,29 +66,6 @@ get_header(); ?>
                                 </div>
                             <?php endif; ?>
 
-                            <!-- Category Filter -->
-                            <div class="widget woocommerce">
-                                <h4 class="widget-title"><?php esc_html_e('Categories', 'kacosmetics'); ?></h4>
-                                <ul class="product-categories">
-                                    <?php
-                                    $categories = get_terms(array(
-                                        'taxonomy' => 'product_cat',
-                                        'hide_empty' => true,
-                                        'exclude' => get_option('default_product_cat'),
-                                    ));
-                                    foreach ($categories as $cat) :
-                                        $count = $cat->count;
-                                        ?>
-                                        <li>
-                                            <a href="<?php echo get_term_link($cat); ?>">
-                                                <?php echo esc_html($cat->name); ?>
-                                                <span class="count">(<?php echo $count; ?>)</span>
-                                            </a>
-                                        </li>
-                                    <?php endforeach; ?>
-                                </ul>
-                            </div>
-
                             <!-- Brand Filter -->
                             <?php
                             $brands = get_terms(array(
@@ -129,6 +106,30 @@ get_header(); ?>
                     'orderby' => 'date',
                     'order' => 'DESC'
                 );
+
+                // Add price filter support
+                if ( isset( $_GET['min_price'] ) || isset( $_GET['max_price'] ) ) {
+                    $all_args['meta_query'] = array( 'relation' => 'AND' );
+
+                    if ( isset( $_GET['min_price'] ) ) {
+                        $all_args['meta_query'][] = array(
+                            'key'     => '_price',
+                            'value'   => floatval( $_GET['min_price'] ),
+                            'compare' => '>=',
+                            'type'    => 'NUMERIC'
+                        );
+                    }
+
+                    if ( isset( $_GET['max_price'] ) ) {
+                        $all_args['meta_query'][] = array(
+                            'key'     => '_price',
+                            'value'   => floatval( $_GET['max_price'] ),
+                            'compare' => '<=',
+                            'type'    => 'NUMERIC'
+                        );
+                    }
+                }
+
                 $all_query = new WP_Query($all_args);
 
                 if ($all_query->have_posts()) :
@@ -204,6 +205,30 @@ get_header(); ?>
                             'orderby' => 'date',
                             'order' => 'DESC'
                         );
+
+                        // Add price filter support
+                        if ( isset( $_GET['min_price'] ) || isset( $_GET['max_price'] ) ) {
+                            $category_args['meta_query'] = array( 'relation' => 'AND' );
+
+                            if ( isset( $_GET['min_price'] ) ) {
+                                $category_args['meta_query'][] = array(
+                                    'key'     => '_price',
+                                    'value'   => floatval( $_GET['min_price'] ),
+                                    'compare' => '>=',
+                                    'type'    => 'NUMERIC'
+                                );
+                            }
+
+                            if ( isset( $_GET['max_price'] ) ) {
+                                $category_args['meta_query'][] = array(
+                                    'key'     => '_price',
+                                    'value'   => floatval( $_GET['max_price'] ),
+                                    'compare' => '<=',
+                                    'type'    => 'NUMERIC'
+                                );
+                            }
+                        }
+
                         $category_query = new WP_Query($category_args);
 
                         if ($category_query->have_posts()) :
