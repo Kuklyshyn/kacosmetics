@@ -53,7 +53,7 @@ msgstr "Nájsť butik"
 
 #: header.php
 msgid "EXCLUSIVITY: Discover our new collection."
-msgstr "EXKLUZÍVNE: Objavte našu novú kolekciu."
+msgstr "Doprava zdarma pri nákupe nad 100 €"
 
 #: header.php
 msgid "Shop now."

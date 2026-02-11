@@ -155,7 +155,7 @@ $product_count = $current_brand->count;
 
                 $args = array(
                     'post_type' => 'product',
-                    'posts_per_page' => 12,
+                    'posts_per_page' => -1,
                     'tax_query' => array(
                         array(
                             'taxonomy' => 'product_brand',

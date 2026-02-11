@@ -53,7 +53,7 @@ msgstr "Знайти бутік"
 
 #: header.php
 msgid "EXCLUSIVITY: Discover our new collection."
-msgstr "ЕКСКЛЮЗИВ: Відкрийте нашу нову колекцію."
+msgstr "Безкоштовна доставка при замовленні від 100 €"
 
 #: header.php
 msgid "Shop now."
