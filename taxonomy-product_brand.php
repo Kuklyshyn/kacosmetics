@@ -53,8 +53,22 @@ if ($thumbnail_id) {
     $brand_image = wp_get_attachment_image_url($thumbnail_id, 'large');
 }
 
-// Get product count
-$product_count = $current_brand->count;
+// Get product count for current language
+$count_query = new WP_Query( array(
+    'post_type'      => 'product',
+    'post_status'    => 'publish',
+    'posts_per_page' => -1,
+    'fields'         => 'ids',
+    'tax_query'      => array(
+        array(
+            'taxonomy' => 'product_brand',
+            'field'    => 'term_id',
+            'terms'    => $current_brand->term_id,
+        ),
+    ),
+) );
+$product_count = $count_query->found_posts;
+wp_reset_postdata();
 ?>
 
 <div id="primary" class="content-area">
@@ -139,41 +153,21 @@ $product_count = $current_brand->count;
         <div class="products-container">
             <div class="products-grid active" id="brand-products">
                 <?php
-                // Collect all translations of this brand
-                $brand_ids = array( $current_brand->term_id );
-                if ( function_exists( 'pll_get_term_translations' ) ) {
-                    $translations = pll_get_term_translations( $current_brand->term_id );
-                    if ( ! empty( $translations ) ) {
-                        $brand_ids = array_values( $translations );
-                    }
-                }
-
-                // Temporarily disable Polylang language filtering for products
-                if ( function_exists( 'PLL' ) ) {
-                    remove_action( 'parse_query', array( PLL()->filters_post, 'parse_query' ), 6 );
-                }
-
+                // Query products for current brand (Polylang will filter by current language automatically)
                 $args = array(
-                    'post_type' => 'product',
+                    'post_type'      => 'product',
                     'posts_per_page' => -1,
-                    'tax_query' => array(
+                    'tax_query'      => array(
                         array(
                             'taxonomy' => 'product_brand',
-                            'field' => 'term_id',
-                            'terms' => $brand_ids, // Use all brand translations
-                            'operator' => 'IN'
-                        )
+                            'field'    => 'term_id',
+                            'terms'    => $current_brand->term_id,
+                        ),
                     ),
                     'orderby' => 'date',
-                    'order' => 'DESC',
-                    'lang' => '', // Disable language filter
+                    'order'   => 'DESC',
                 );
-                $products_query = new WP_Query($args);
-
-                // Re-enable Polylang filtering
-                if ( function_exists( 'PLL' ) && isset( PLL()->filters_post ) ) {
-                    add_action( 'parse_query', array( PLL()->filters_post, 'parse_query' ), 6 );
-                }
+                $products_query = new WP_Query( $args );
 
                 if ($products_query->have_posts()) :
                     while ($products_query->have_posts()) : $products_query->the_post();
