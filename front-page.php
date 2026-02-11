@@ -7,6 +7,95 @@
 
 get_header();
 
+// Get hero banner slides
+$hero_slides = kacosmetics_get_hero_slides();
+$hero_height = get_theme_mod('hero_banner_height', '500');
+$hero_height_mobile = get_theme_mod('hero_banner_height_mobile', '300');
+$hero_autoplay = get_theme_mod('hero_banner_autoplay', true);
+$hero_interval = get_theme_mod('hero_banner_interval', 5000);
+
+if (!empty($hero_slides)) :
+	$is_single = count($hero_slides) === 1;
+?>
+<style>
+	.hero-banner-container {
+		--hero-height: <?php echo esc_attr($hero_height); ?>px;
+		--hero-height-mobile: <?php echo esc_attr($hero_height_mobile); ?>px;
+	}
+</style>
+<div class="hero-banner<?php echo $is_single ? ' single-slide' : ''; ?>"
+     data-autoplay="<?php echo $hero_autoplay ? 'true' : 'false'; ?>"
+     data-interval="<?php echo esc_attr($hero_interval); ?>">
+	<div class="hero-banner-container">
+		<div class="hero-slides">
+			<?php foreach ($hero_slides as $index => $slide) :
+				$has_content = !empty($slide['title']) || !empty($slide['subtitle']) || !empty($slide['button']);
+				$has_mobile = !empty($slide['image_mobile']);
+			?>
+				<div class="hero-slide<?php echo $index === 0 ? ' active' : ''; ?>">
+					<?php if (!empty($slide['link'])) : ?>
+						<a href="<?php echo esc_url($slide['link']); ?>" class="hero-slide-link">
+					<?php endif; ?>
+
+					<?php if ($has_mobile) : ?>
+						<img src="<?php echo esc_url($slide['image']); ?>"
+						     alt="<?php echo esc_attr($slide['title']); ?>"
+						     class="hero-slide-image desktop-image"
+						     loading="<?php echo $index === 0 ? 'eager' : 'lazy'; ?>">
+						<img src="<?php echo esc_url($slide['image_mobile']); ?>"
+						     alt="<?php echo esc_attr($slide['title']); ?>"
+						     class="hero-slide-image mobile-image"
+						     loading="<?php echo $index === 0 ? 'eager' : 'lazy'; ?>">
+					<?php else : ?>
+						<img src="<?php echo esc_url($slide['image']); ?>"
+						     alt="<?php echo esc_attr($slide['title']); ?>"
+						     class="hero-slide-image desktop-image no-mobile"
+						     loading="<?php echo $index === 0 ? 'eager' : 'lazy'; ?>">
+					<?php endif; ?>
+
+					<?php if ($has_content) : ?>
+						<div class="hero-slide-content">
+							<?php if (!empty($slide['title'])) : ?>
+								<h2 class="hero-slide-title"><?php echo esc_html($slide['title']); ?></h2>
+							<?php endif; ?>
+							<?php if (!empty($slide['subtitle'])) : ?>
+								<p class="hero-slide-subtitle"><?php echo esc_html($slide['subtitle']); ?></p>
+							<?php endif; ?>
+							<?php if (!empty($slide['button']) && !empty($slide['link'])) : ?>
+								<span class="hero-slide-button"><?php echo esc_html($slide['button']); ?></span>
+							<?php endif; ?>
+						</div>
+					<?php endif; ?>
+
+					<?php if (!empty($slide['link'])) : ?>
+						</a>
+					<?php endif; ?>
+				</div>
+			<?php endforeach; ?>
+		</div>
+
+		<?php if (!$is_single) : ?>
+			<!-- Navigation arrows -->
+			<button class="hero-nav hero-nav-prev" aria-label="<?php esc_attr_e('Previous slide', 'kacosmetics'); ?>">
+				<svg viewBox="0 0 24 24"><polyline points="15,18 9,12 15,6"></polyline></svg>
+			</button>
+			<button class="hero-nav hero-nav-next" aria-label="<?php esc_attr_e('Next slide', 'kacosmetics'); ?>">
+				<svg viewBox="0 0 24 24"><polyline points="9,6 15,12 9,18"></polyline></svg>
+			</button>
+
+			<!-- Dots navigation -->
+			<div class="hero-dots">
+				<?php for ($i = 0; $i < count($hero_slides); $i++) : ?>
+					<button class="hero-dot<?php echo $i === 0 ? ' active' : ''; ?>"
+					        aria-label="<?php printf(esc_attr__('Go to slide %d', 'kacosmetics'), $i + 1); ?>"></button>
+				<?php endfor; ?>
+			</div>
+		<?php endif; ?>
+	</div>
+</div>
+<?php endif; ?>
+
+<?php
 // Get top-level product categories that have products
 $categories = get_terms(array(
     'taxonomy'   => 'product_cat',
