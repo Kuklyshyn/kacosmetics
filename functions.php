@@ -9,7 +9,7 @@
 
 if ( ! defined( '_S_VERSION' ) ) {
 	// Replace the version number of the theme on each release.
-	define( '_S_VERSION', '1.0.10' );
+	define( '_S_VERSION', '2.1.0' );
 }
 
 /**
@@ -919,8 +919,111 @@ function kacosmetics_contact_customizer($wp_customize) {
 		'section' => 'kacosmetics_company_info',
 		'type' => 'textarea',
 	));
+
+	// Add About Us & Social Media Section
+	$wp_customize->add_section('kacosmetics_about_social', array(
+		'title' => __('About Us & Social Media', 'kacosmetics'),
+		'priority' => 32,
+	));
+
+	// About Us Text
+	$wp_customize->add_setting('kacosmetics_about_text', array(
+		'default' => 'K&A Cosmetics je slovenská kozmetická spoločnosť zameraná na kvalitné produkty pre starostlivosť o pleť a telo. Naším poslaním je prinášať vám tie najlepšie kozmetické produkty za dostupné ceny.',
+		'sanitize_callback' => 'sanitize_textarea_field',
+	));
+	$wp_customize->add_control('kacosmetics_about_text', array(
+		'label' => __('About Us Text', 'kacosmetics'),
+		'section' => 'kacosmetics_about_social',
+		'type' => 'textarea',
+	));
+
+	// Facebook URL
+	$wp_customize->add_setting('kacosmetics_facebook_url', array(
+		'default' => '',
+		'sanitize_callback' => 'esc_url_raw',
+	));
+	$wp_customize->add_control('kacosmetics_facebook_url', array(
+		'label' => __('Facebook URL', 'kacosmetics'),
+		'section' => 'kacosmetics_about_social',
+		'type' => 'url',
+	));
+
+	// Instagram URL
+	$wp_customize->add_setting('kacosmetics_instagram_url', array(
+		'default' => '',
+		'sanitize_callback' => 'esc_url_raw',
+	));
+	$wp_customize->add_control('kacosmetics_instagram_url', array(
+		'label' => __('Instagram URL', 'kacosmetics'),
+		'section' => 'kacosmetics_about_social',
+		'type' => 'url',
+	));
+
+	// TikTok URL
+	$wp_customize->add_setting('kacosmetics_tiktok_url', array(
+		'default' => '',
+		'sanitize_callback' => 'esc_url_raw',
+	));
+	$wp_customize->add_control('kacosmetics_tiktok_url', array(
+		'label' => __('TikTok URL', 'kacosmetics'),
+		'section' => 'kacosmetics_about_social',
+		'type' => 'url',
+	));
+
+	// YouTube URL
+	$wp_customize->add_setting('kacosmetics_youtube_url', array(
+		'default' => '',
+		'sanitize_callback' => 'esc_url_raw',
+	));
+	$wp_customize->add_control('kacosmetics_youtube_url', array(
+		'label' => __('YouTube URL', 'kacosmetics'),
+		'section' => 'kacosmetics_about_social',
+		'type' => 'url',
+	));
 }
 add_action('customize_register', 'kacosmetics_contact_customizer');
+
+/**
+ * Register Customizer strings for Polylang translation
+ */
+function kacosmetics_register_polylang_strings() {
+	if (function_exists('pll_register_string')) {
+		// About Us text
+		$about_text = get_theme_mod('kacosmetics_about_text', '');
+		if (!empty($about_text)) {
+			pll_register_string('about_us_text', $about_text, 'Theme: Contact Page', true);
+		}
+
+		// Contact information
+		$contact_address = get_theme_mod('kacosmetics_contact_address', '');
+		if (!empty($contact_address)) {
+			pll_register_string('contact_address', $contact_address, 'Theme: Contact Page', true);
+		}
+
+		$working_hours = get_theme_mod('kacosmetics_working_hours', '');
+		if (!empty($working_hours)) {
+			pll_register_string('working_hours', $working_hours, 'Theme: Contact Page', true);
+		}
+
+		// Company information
+		$company_register = get_theme_mod('kacosmetics_company_register', '');
+		if (!empty($company_register)) {
+			pll_register_string('company_register', $company_register, 'Theme: Contact Page', true);
+		}
+	}
+}
+add_action('init', 'kacosmetics_register_polylang_strings');
+
+/**
+ * Helper function to get translated theme mod
+ */
+function kacosmetics_get_translated_mod($mod_name, $default = '') {
+	$value = get_theme_mod($mod_name, $default);
+	if (function_exists('pll__') && !empty($value)) {
+		return pll__($value);
+	}
+	return $value;
+}
 
 /**
  * Handle Contact Form Submission

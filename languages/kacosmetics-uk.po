@@ -192,3 +192,11 @@ msgstr "Кошик"
 #: general
 msgid "Remove this item"
 msgstr "Видалити цей товар"
+
+#: page-contact.php
+msgid "About Us"
+msgstr "Про нас"
+
+#: page-contact.php
+msgid "Follow us:"
+msgstr "Слідкуйте за нами:"

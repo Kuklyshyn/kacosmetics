@@ -300,3 +300,35 @@ msgstr "Zemepisná šírka"
 #: functions.php
 msgid "Map Longitude"
 msgstr "Zemepisná dĺžka"
+
+#: functions.php
+msgid "About Us & Social Media"
+msgstr "O nás a sociálne siete"
+
+#: functions.php
+msgid "About Us Text"
+msgstr "Text o nás"
+
+#: functions.php
+msgid "Facebook URL"
+msgstr "Facebook URL"
+
+#: functions.php
+msgid "Instagram URL"
+msgstr "Instagram URL"
+
+#: functions.php
+msgid "TikTok URL"
+msgstr "TikTok URL"
+
+#: functions.php
+msgid "YouTube URL"
+msgstr "YouTube URL"
+
+#: page-contact.php
+msgid "About Us"
+msgstr "O nás"
+
+#: page-contact.php
+msgid "Follow us:"
+msgstr "Sledujte nás:"

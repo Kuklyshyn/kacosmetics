@@ -49,7 +49,7 @@
 			<div class="mobile-menu-section">
 				<ul>
 					<li><a href="<?php echo esc_url(kac_get_contact_page_url()); ?>"><?php esc_html_e('Contact us', 'kacosmetics'); ?></a></li>
-					<li><a href="<?php echo kac_url('stores/'); ?>"><?php esc_html_e('Find a boutique', 'kacosmetics'); ?></a></li>
+					<li><a href="https://www.google.com/maps/place//data=!4m2!3m1!1s0x476c892c15c0fe39:0x4fe6974372dde52f?sa=X&ved=1t:8290&ictx=111"><?php esc_html_e('Find a boutique', 'kacosmetics'); ?></a></li>
 				</ul>
 			</div>
 			<div class="mobile-menu-section">

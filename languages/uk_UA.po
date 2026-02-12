@@ -300,3 +300,36 @@ msgstr "Широта карти"
 #: functions.php
 msgid "Map Longitude"
 msgstr "Довгота карти"
+
+
+#: functions.php
+msgid "About Us & Social Media"
+msgstr "Про нас та соціальні мережі"
+
+#: functions.php
+msgid "About Us Text"
+msgstr "Текст про нас"
+
+#: functions.php
+msgid "Facebook URL"
+msgstr "Facebook URL"
+
+#: functions.php
+msgid "Instagram URL"
+msgstr "Instagram URL"
+
+#: functions.php
+msgid "TikTok URL"
+msgstr "TikTok URL"
+
+#: functions.php
+msgid "YouTube URL"
+msgstr "YouTube URL"
+
+#: page-contact.php
+msgid "About Us"
+msgstr "Про нас"
+
+#: page-contact.php
+msgid "Follow us:"
+msgstr "Слідкуйте за нами:"
