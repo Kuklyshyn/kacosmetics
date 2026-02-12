@@ -1332,3 +1332,83 @@ function modify_checkout_request_data( $response, $handler, $request ) {
     
     return $response;
 }
+
+// Автоматично вибрати самовивіз при завантаженні (але дозволити змінити)
+add_action( 'wp_footer', 'auto_select_local_pickup_once', 999 );
+function auto_select_local_pickup_once() {
+    if ( is_checkout() ) {
+        ?>
+        <script>
+        jQuery(document).ready(function($){
+            console.log('=== PICKUP AUTO-SELECT (ONE TIME) ===');
+            
+            var userHasInteracted = false; // Прапорець чи користувач вже клікав
+            
+            function selectPickup() {
+                // Якщо користувач вже вибирав - не чіпаємо
+                if (userHasInteracted) {
+                    console.log('⏸️ Користувач вже вибирав доставку, пропускаємо');
+                    return true;
+                }
+                
+                var shippingOptions = $('.wc-block-checkout__shipping-method-option');
+                
+                if (shippingOptions.length === 0) {
+                    console.log('⏳ Опції доставки ще не завантажені');
+                    return false;
+                }
+                
+                console.log('✓ Знайдено опцій:', shippingOptions.length);
+                
+                var pickupOption = null;
+                
+                shippingOptions.each(function() {
+                    var text = $(this).text().toLowerCase();
+                    if (text.includes('osobné') || text.includes('vyzdvih') || text.includes('pickup')) {
+                        pickupOption = $(this);
+                        return false;
+                    }
+                });
+                
+                if (pickupOption && !pickupOption.hasClass('wc-block-checkout__shipping-method-option--selected')) {
+                    console.log('✓ Вибираю самовивіз автоматично...');
+                    pickupOption.click();
+                    return true;
+                } else if (pickupOption && pickupOption.hasClass('wc-block-checkout__shipping-method-option--selected')) {
+                    console.log('✓ Самовивіз вже обраний');
+                    return true;
+                }
+                
+                return false;
+            }
+            
+            // Відстежуємо клік користувача на будь-яку опцію доставки
+            $(document).on('click', '.wc-block-checkout__shipping-method-option', function() {
+                console.log('👆 Користувач вибрав доставку вручну');
+                userHasInteracted = true; // Більше не втручаємось
+            });
+            
+            // Спроби вибрати самовивіз (тільки якщо користувач ще не клікав)
+            var attempts = 0;
+            function trySelect() {
+                if (userHasInteracted) {
+                    return; // Припинити спроби
+                }
+                
+                attempts++;
+                console.log('Спроба #' + attempts);
+                
+                if (selectPickup()) {
+                    console.log('✅ SUCCESS: Самовивіз обрано автоматично');
+                } else if (attempts < 10) {
+                    setTimeout(trySelect, 500);
+                }
+            }
+            
+            // Почати через 500ms
+            setTimeout(trySelect, 500);
+        });
+        </script>
+        <?php
+    }
+}
