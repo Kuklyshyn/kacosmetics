@@ -333,3 +333,19 @@ msgstr "Про нас"
 #: page-contact.php
 msgid "Follow us:"
 msgstr "Слідкуйте за нами:"
+
+#: functions.php - Product Badges
+msgid "Product Badge"
+msgstr "Бейдж товару"
+
+msgid "Bestseller"
+msgstr "Бестселер"
+
+msgid "Must Try"
+msgstr "Варто спробувати"
+
+msgid "None"
+msgstr "Немає"
+
+msgid "Select a badge to display on this product."
+msgstr "Виберіть бейдж для відображення на цьому товарі."

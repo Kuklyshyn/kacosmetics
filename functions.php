@@ -9,7 +9,7 @@
 
 if ( ! defined( '_S_VERSION' ) ) {
 	// Replace the version number of the theme on each release.
-	define( '_S_VERSION', '2.1.0' );
+	define( '_S_VERSION', '2.1.2' );
 }
 
 /**
@@ -980,6 +980,24 @@ function kacosmetics_contact_customizer($wp_customize) {
 		'section' => 'kacosmetics_about_social',
 		'type' => 'url',
 	));
+
+	// Contact Form Settings Section
+	$wp_customize->add_section('kacosmetics_contact_form', array(
+		'title' => __('Contact Form', 'kacosmetics'),
+		'priority' => 33,
+	));
+
+	// Contact Form ID
+	$wp_customize->add_setting('kacosmetics_contact_form_id', array(
+		'default' => '',
+		'sanitize_callback' => 'sanitize_text_field',
+	));
+	$wp_customize->add_control('kacosmetics_contact_form_id', array(
+		'label' => __('Contact Form ID', 'kacosmetics'),
+		'description' => __('Enter the WPForms or Contact Form 7 form ID. Leave empty to use built-in form.', 'kacosmetics'),
+		'section' => 'kacosmetics_contact_form',
+		'type' => 'text',
+	));
 }
 add_action('customize_register', 'kacosmetics_contact_customizer');
 
@@ -1514,4 +1532,60 @@ function auto_select_local_pickup_once() {
         </script>
         <?php
     }
+}
+
+/**
+ * Product Badges (Bestseller, Must Try)
+ */
+
+// Display badge on shop loop and single product
+add_action('woocommerce_before_shop_loop_item_title', 'kacosmetics_display_product_badge', 10);
+add_action('woocommerce_before_single_product_summary', 'kacosmetics_display_product_badge', 5);
+
+function kacosmetics_display_product_badge() {
+    global $product;
+
+    if (!$product) {
+        return;
+    }
+
+    $badge = get_post_meta($product->get_id(), '_product_badge', true);
+
+    if ($badge) {
+        $badge_labels = array(
+            'bestseller' => __('Bestseller', 'kacosmetics'),
+            'must-try' => __('Must Try', 'kacosmetics'),
+            'new' => __('New', 'kacosmetics'),
+            'sale' => __('Sale', 'kacosmetics'),
+        );
+
+        $label = isset($badge_labels[$badge]) ? $badge_labels[$badge] : ucfirst(str_replace('-', ' ', $badge));
+        echo '<span class="product-badge badge-' . esc_attr($badge) . '">' . esc_html($label) . '</span>';
+    }
+}
+
+// Add badge field to product admin
+add_action('woocommerce_product_options_general_product_data', 'kacosmetics_add_badge_field');
+
+function kacosmetics_add_badge_field() {
+    woocommerce_wp_select(array(
+        'id' => '_product_badge',
+        'label' => __('Product Badge', 'kacosmetics'),
+        'desc_tip' => true,
+        'description' => __('Select a badge to display on this product.', 'kacosmetics'),
+        'options' => array(
+            '' => __('None', 'kacosmetics'),
+            'bestseller' => __('Bestseller', 'kacosmetics'),
+            'must-try' => __('Must Try', 'kacosmetics'),
+            'new' => __('New', 'kacosmetics'),
+        )
+    ));
+}
+
+// Save badge field
+add_action('woocommerce_process_product_meta', 'kacosmetics_save_badge_field');
+
+function kacosmetics_save_badge_field($post_id) {
+    $badge = isset($_POST['_product_badge']) ? sanitize_text_field($_POST['_product_badge']) : '';
+    update_post_meta($post_id, '_product_badge', $badge);
 }

@@ -1619,6 +1619,16 @@ body.mobile-menu-open {
   color: #fff;
 }
 
+.badge-bestseller {
+  background: #ff6b6b;
+  color: #fff;
+}
+
+.badge-must-try {
+  background: #4ecdc4;
+  color: #fff;
+}
+
 .product-image-link {
   display: block;
   overflow: hidden;
@@ -2791,6 +2801,53 @@ body.mobile-menu-open {
 .related-products-section .product .badge-new {
   background: #ff4586 !important;
   color: #fff !important;
+}
+
+/* Product Badges (Bestseller, Must Try, New) */
+.woocommerce-loop-product__link,
+.woocommerce-LoopProduct-link {
+  position: relative;
+  display: block;
+}
+
+.products .product {
+  position: relative;
+}
+
+.product-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 6px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  z-index: 10;
+  line-height: 1;
+}
+
+.badge-bestseller {
+  background: #ff6b6b;
+  color: #fff;
+}
+
+.badge-must-try {
+  background: #4ecdc4;
+  color: #fff;
+}
+
+.badge-new {
+  background: #ff4586;
+  color: #fff;
+}
+
+/* Single product badge positioning */
+.product-gallery-section .product-badge {
+  top: 20px;
+  left: 20px;
+  padding: 8px 15px;
+  font-size: 12px;
 }
 
 .related-products-section .product .product-image-link,

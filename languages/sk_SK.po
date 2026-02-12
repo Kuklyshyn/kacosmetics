@@ -332,3 +332,19 @@ msgstr "O nás"
 #: page-contact.php
 msgid "Follow us:"
 msgstr "Sledujte nás:"
+
+#: functions.php - Product Badges
+msgid "Product Badge"
+msgstr "Odznak produktu"
+
+msgid "Bestseller"
+msgstr "Bestseller"
+
+msgid "Must Try"
+msgstr "Musíte vyskúšať"
+
+msgid "None"
+msgstr "Žiadny"
+
+msgid "Select a badge to display on this product."
+msgstr "Vyberte odznak, ktorý sa zobrazí na tomto produkte."

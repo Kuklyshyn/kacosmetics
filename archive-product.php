@@ -138,6 +138,18 @@ get_header(); ?>
                         ?>
                         <div class="product-card">
                             <div class="product-badges">
+                                <?php
+                                $product_badge = get_post_meta(get_the_ID(), '_product_badge', true);
+                                if ($product_badge) :
+                                    $badge_labels = array(
+                                        'bestseller' => __('Bestseller', 'kacosmetics'),
+                                        'must-try' => __('Must Try', 'kacosmetics'),
+                                        'new' => __('New', 'kacosmetics'),
+                                    );
+                                    $label = isset($badge_labels[$product_badge]) ? $badge_labels[$product_badge] : ucfirst(str_replace('-', ' ', $product_badge));
+                                ?>
+                                    <span class="badge badge-<?php echo esc_attr($product_badge); ?>"><?php echo esc_html($label); ?></span>
+                                <?php endif; ?>
                                 <?php if (get_post_meta(get_the_ID(), '_is_new', true)) : ?>
                                     <span class="badge badge-new"><?php esc_html_e('New', 'kacosmetics'); ?></span>
                                 <?php endif; ?>
