@@ -193,6 +193,22 @@ get_header(); ?>
                     endwhile;
                     ?>
 
+                    <?php if ($all_query->max_num_pages > 1) : ?>
+                    <nav class="woocommerce-pagination">
+                        <?php
+                        echo paginate_links(array(
+                            'base' => str_replace(999999999, '%#%', esc_url(get_pagenum_link(999999999))),
+                            'format' => '?paged=%#%',
+                            'current' => max(1, $paged),
+                            'total' => $all_query->max_num_pages,
+                            'prev_text' => '&larr;',
+                            'next_text' => '&rarr;',
+                            'type' => 'list',
+                        ));
+                        ?>
+                    </nav>
+                    <?php endif; ?>
+
                     <?php
                     wp_reset_postdata();
                 else :
@@ -200,22 +216,6 @@ get_header(); ?>
                 endif;
                 ?>
             </div>
-
-            <?php if ($all_query->max_num_pages > 1) : ?>
-            <nav class="woocommerce-pagination">
-                <?php
-                echo paginate_links(array(
-                    'base' => str_replace(999999999, '%#%', esc_url(get_pagenum_link(999999999))),
-                    'format' => '?paged=%#%',
-                    'current' => max(1, $paged),
-                    'total' => $all_query->max_num_pages,
-                    'prev_text' => '&larr;',
-                    'next_text' => '&rarr;',
-                    'type' => 'list',
-                ));
-                ?>
-            </nav>
-            <?php endif; ?>
 
             <?php
             // Create product grids for each category
