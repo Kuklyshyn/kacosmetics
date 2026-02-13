@@ -1589,3 +1589,219 @@ function kacosmetics_save_badge_field($post_id) {
     $badge = isset($_POST['_product_badge']) ? sanitize_text_field($_POST['_product_badge']) : '';
     update_post_meta($post_id, '_product_badge', $badge);
 }
+
+/**
+ * Meta Pixel (Facebook Pixel) Integration
+ * Events: PageView, ViewContent, AddToCart, InitiateCheckout, Purchase
+ */
+
+// Add Meta Pixel ID setting to Customizer
+add_action('customize_register', 'kacosmetics_meta_pixel_customizer');
+function kacosmetics_meta_pixel_customizer($wp_customize) {
+    $wp_customize->add_section('kacosmetics_meta_pixel', array(
+        'title'    => __('Meta Pixel', 'kacosmetics'),
+        'priority' => 35,
+    ));
+
+    $wp_customize->add_setting('meta_pixel_id', array(
+        'default'           => '',
+        'sanitize_callback' => 'sanitize_text_field',
+    ));
+    $wp_customize->add_control('meta_pixel_id', array(
+        'label'       => __('Meta Pixel ID', 'kacosmetics'),
+        'description' => __('Enter your Meta (Facebook) Pixel ID', 'kacosmetics'),
+        'section'     => 'kacosmetics_meta_pixel',
+        'type'        => 'text',
+    ));
+}
+
+// Output Meta Pixel base code in head
+add_action('wp_head', 'kacosmetics_meta_pixel_base_code', 1);
+function kacosmetics_meta_pixel_base_code() {
+    $pixel_id = get_theme_mod('meta_pixel_id', '');
+
+    if (empty($pixel_id)) {
+        return;
+    }
+    ?>
+    <!-- Meta Pixel Code -->
+    <script>
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '<?php echo esc_js($pixel_id); ?>');
+    fbq('track', 'PageView');
+    </script>
+    <noscript><img height="1" width="1" style="display:none"
+    src="https://www.facebook.com/tr?id=<?php echo esc_attr($pixel_id); ?>&ev=PageView&noscript=1"
+    /></noscript>
+    <!-- End Meta Pixel Code -->
+    <?php
+}
+
+// ViewContent event on single product page
+add_action('wp_footer', 'kacosmetics_meta_pixel_view_content');
+function kacosmetics_meta_pixel_view_content() {
+    $pixel_id = get_theme_mod('meta_pixel_id', '');
+
+    if (empty($pixel_id) || !is_product()) {
+        return;
+    }
+
+    global $product;
+
+    if (!$product) {
+        return;
+    }
+
+    $categories = wp_get_post_terms($product->get_id(), 'product_cat', array('fields' => 'names'));
+    $category = !empty($categories) ? $categories[0] : '';
+    ?>
+    <script>
+    fbq('track', 'ViewContent', {
+        content_name: '<?php echo esc_js($product->get_name()); ?>',
+        content_category: '<?php echo esc_js($category); ?>',
+        content_ids: ['<?php echo esc_js($product->get_id()); ?>'],
+        content_type: 'product',
+        value: <?php echo esc_js($product->get_price()); ?>,
+        currency: '<?php echo esc_js(get_woocommerce_currency()); ?>'
+    });
+    </script>
+    <?php
+}
+
+// AddToCart event via JavaScript
+add_action('wp_footer', 'kacosmetics_meta_pixel_add_to_cart');
+function kacosmetics_meta_pixel_add_to_cart() {
+    $pixel_id = get_theme_mod('meta_pixel_id', '');
+
+    if (empty($pixel_id)) {
+        return;
+    }
+    ?>
+    <script>
+    jQuery(document).ready(function($) {
+        // Standard add to cart button
+        $(document.body).on('added_to_cart', function(event, fragments, cart_hash, $button) {
+            var productId = $button.data('product_id');
+            var productName = $button.data('product_name') || '';
+            var productPrice = $button.data('product_price') || 0;
+
+            fbq('track', 'AddToCart', {
+                content_ids: [productId],
+                content_type: 'product',
+                content_name: productName,
+                value: parseFloat(productPrice),
+                currency: '<?php echo esc_js(get_woocommerce_currency()); ?>'
+            });
+        });
+
+        // Single product page add to cart
+        $('form.cart').on('submit', function() {
+            var productId = $(this).find('button[name="add-to-cart"]').val() || $('input[name="add-to-cart"]').val();
+            var quantity = $(this).find('input[name="quantity"]').val() || 1;
+
+            <?php if (is_product()) :
+                global $product;
+                if ($product) :
+            ?>
+            fbq('track', 'AddToCart', {
+                content_ids: ['<?php echo esc_js($product->get_id()); ?>'],
+                content_type: 'product',
+                content_name: '<?php echo esc_js($product->get_name()); ?>',
+                value: <?php echo esc_js($product->get_price()); ?> * parseInt(quantity),
+                currency: '<?php echo esc_js(get_woocommerce_currency()); ?>'
+            });
+            <?php endif; endif; ?>
+        });
+    });
+    </script>
+    <?php
+}
+
+// InitiateCheckout event on checkout page
+add_action('wp_footer', 'kacosmetics_meta_pixel_initiate_checkout');
+function kacosmetics_meta_pixel_initiate_checkout() {
+    $pixel_id = get_theme_mod('meta_pixel_id', '');
+
+    if (empty($pixel_id) || !is_checkout() || is_order_received_page()) {
+        return;
+    }
+
+    $cart = WC()->cart;
+    if (!$cart) {
+        return;
+    }
+
+    $product_ids = array();
+    $product_names = array();
+
+    foreach ($cart->get_cart() as $cart_item) {
+        $product_ids[] = $cart_item['product_id'];
+        $product_names[] = $cart_item['data']->get_name();
+    }
+    ?>
+    <script>
+    fbq('track', 'InitiateCheckout', {
+        content_ids: <?php echo json_encode($product_ids); ?>,
+        content_type: 'product',
+        num_items: <?php echo esc_js($cart->get_cart_contents_count()); ?>,
+        value: <?php echo esc_js($cart->get_cart_contents_total()); ?>,
+        currency: '<?php echo esc_js(get_woocommerce_currency()); ?>'
+    });
+    </script>
+    <?php
+}
+
+// Purchase event on thank you page
+add_action('woocommerce_thankyou', 'kacosmetics_meta_pixel_purchase', 10, 1);
+function kacosmetics_meta_pixel_purchase($order_id) {
+    $pixel_id = get_theme_mod('meta_pixel_id', '');
+
+    if (empty($pixel_id) || !$order_id) {
+        return;
+    }
+
+    // Prevent duplicate tracking
+    $tracked = get_post_meta($order_id, '_meta_pixel_tracked', true);
+    if ($tracked) {
+        return;
+    }
+
+    $order = wc_get_order($order_id);
+    if (!$order) {
+        return;
+    }
+
+    $product_ids = array();
+    $contents = array();
+
+    foreach ($order->get_items() as $item) {
+        $product_id = $item->get_product_id();
+        $product_ids[] = $product_id;
+        $contents[] = array(
+            'id' => $product_id,
+            'quantity' => $item->get_quantity(),
+        );
+    }
+
+    // Mark as tracked
+    update_post_meta($order_id, '_meta_pixel_tracked', true);
+    ?>
+    <script>
+    fbq('track', 'Purchase', {
+        content_ids: <?php echo json_encode($product_ids); ?>,
+        contents: <?php echo json_encode($contents); ?>,
+        content_type: 'product',
+        num_items: <?php echo esc_js($order->get_item_count()); ?>,
+        value: <?php echo esc_js($order->get_total()); ?>,
+        currency: '<?php echo esc_js($order->get_currency()); ?>'
+    });
+    </script>
+    <?php
+}
