@@ -1562,6 +1562,11 @@ body.mobile-menu-open {
   display: grid;
 }
 
+.products-grid .woocommerce-pagination {
+  grid-column: 1 / -1;
+  margin-top: 20px;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;

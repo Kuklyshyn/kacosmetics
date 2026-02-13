@@ -100,9 +100,11 @@ get_header(); ?>
             <!-- All Products -->
             <div class="products-grid active" id="all-products">
                 <?php
+                $paged = get_query_var('paged') ? get_query_var('paged') : 1;
                 $all_args = array(
                     'post_type' => 'product',
                     'posts_per_page' => 12,
+                    'paged' => $paged,
                     'orderby' => 'date',
                     'order' => 'DESC'
                 );
@@ -189,12 +191,31 @@ get_header(); ?>
                         </div>
                         <?php
                     endwhile;
+                    ?>
+
+                    <?php
                     wp_reset_postdata();
                 else :
                     echo '<p class="no-products">' . esc_html__('No products found.', 'kacosmetics') . '</p>';
                 endif;
                 ?>
             </div>
+
+            <?php if ($all_query->max_num_pages > 1) : ?>
+            <nav class="woocommerce-pagination">
+                <?php
+                echo paginate_links(array(
+                    'base' => str_replace(999999999, '%#%', esc_url(get_pagenum_link(999999999))),
+                    'format' => '?paged=%#%',
+                    'current' => max(1, $paged),
+                    'total' => $all_query->max_num_pages,
+                    'prev_text' => '&larr;',
+                    'next_text' => '&rarr;',
+                    'type' => 'list',
+                ));
+                ?>
+            </nav>
+            <?php endif; ?>
 
             <?php
             // Create product grids for each category
