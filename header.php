@@ -35,6 +35,24 @@
 					<li><a href="<?php echo esc_url(wc_get_page_permalink('shop')); ?>"><?php esc_html_e('Shop', 'kacosmetics'); ?></a></li>
 					<li><a href="<?php echo kac_url('brands/'); ?>"><?php esc_html_e('Brands', 'kacosmetics'); ?></a></li>
 				</ul>
+
+				<h3 style="margin-top: 20px;"><?php esc_html_e('Categories', 'kacosmetics'); ?></h3>
+				<ul>
+					<?php
+					$mobile_categories = get_terms(array(
+						'taxonomy' => 'product_cat',
+						'hide_empty' => true,
+						'exclude' => get_option('default_product_cat'),
+						'number' => 10,
+					));
+					if ($mobile_categories && !is_wp_error($mobile_categories)) :
+						foreach ($mobile_categories as $cat) : ?>
+							<li><a href="<?php echo esc_url(get_term_link($cat)); ?>"><?php echo esc_html($cat->name); ?></a></li>
+						<?php endforeach;
+					endif;
+					?>
+				</ul>
+
 				<h3 style="margin-top: 20px;"><?php esc_html_e('MY ACCOUNT', 'kacosmetics'); ?></h3>
 				<ul>
 					<?php if (is_user_logged_in()) : ?>

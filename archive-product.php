@@ -59,10 +59,36 @@ get_header(); ?>
                         <?php else : ?>
 
                             <!-- Price Filter -->
-                            <?php if (class_exists('WC_Widget_Price_Filter')) : ?>
+                            <?php
+                            global $wpdb;
+                            $min_price = $wpdb->get_var( "SELECT MIN( CAST( meta_value AS DECIMAL(10,2) ) ) FROM {$wpdb->postmeta} WHERE meta_key = '_price' AND meta_value != ''" );
+                            $max_price = $wpdb->get_var( "SELECT MAX( CAST( meta_value AS DECIMAL(10,2) ) ) FROM {$wpdb->postmeta} WHERE meta_key = '_price' AND meta_value != ''" );
+
+                            $min_price = floor( $min_price );
+                            $max_price = ceil( $max_price );
+
+                            $current_min = isset( $_GET['min_price'] ) ? floatval( $_GET['min_price'] ) : $min_price;
+                            $current_max = isset( $_GET['max_price'] ) ? floatval( $_GET['max_price'] ) : $max_price;
+
+                            if ( $min_price < $max_price ) :
+                            ?>
                                 <div class="widget woocommerce widget_price_filter">
                                     <h4 class="widget-title"><?php esc_html_e('Price', 'kacosmetics'); ?></h4>
-                                    <?php the_widget('WC_Widget_Price_Filter'); ?>
+                                    <form method="get" action="<?php echo esc_url( wc_get_page_permalink( 'shop' ) ); ?>">
+                                        <div class="price_slider_wrapper">
+                                            <div class="price_slider" style="display:none;"></div>
+                                            <div class="price_slider_amount" data-step="1">
+                                                <input type="text" id="min_price" name="min_price" value="<?php echo esc_attr( $current_min ); ?>" data-min="<?php echo esc_attr( $min_price ); ?>" placeholder="<?php echo esc_attr__( 'Min price', 'woocommerce' ); ?>" />
+                                                <input type="text" id="max_price" name="max_price" value="<?php echo esc_attr( $current_max ); ?>" data-max="<?php echo esc_attr( $max_price ); ?>" placeholder="<?php echo esc_attr__( 'Max price', 'woocommerce' ); ?>" />
+                                                <button type="submit" class="button"><?php echo esc_html__( 'Filter', 'woocommerce' ); ?></button>
+                                                <div class="price_label" style="display:none;">
+                                                    <?php echo esc_html__( 'Price:', 'woocommerce' ); ?> <span class="from"><?php echo wc_price( $current_min ); ?></span> &mdash; <span class="to"><?php echo wc_price( $current_max ); ?></span>
+                                                </div>
+                                                <?php echo wc_query_string_form_fields( null, array( 'min_price', 'max_price', 'paged' ), '', true ); ?>
+                                                <div class="clear"></div>
+                                            </div>
+                                        </div>
+                                    </form>
                                 </div>
                             <?php endif; ?>
 
@@ -221,13 +247,16 @@ get_header(); ?>
             // Create product grids for each category
             if ($product_categories && !is_wp_error($product_categories)) :
                 foreach ($product_categories as $category) :
+                    // Get page number for this category from URL
+                    $cat_paged = isset($_GET['cat_page_' . $category->slug]) ? intval($_GET['cat_page_' . $category->slug]) : 1;
                     ?>
                     <!-- <?php echo esc_html($category->name); ?> Products -->
-                    <div class="products-grid" id="<?php echo esc_attr($category->slug); ?>-products">
+                    <div class="products-grid" id="<?php echo esc_attr($category->slug); ?>-products" data-category="<?php echo esc_attr($category->slug); ?>">
                         <?php
                         $category_args = array(
                             'post_type' => 'product',
                             'posts_per_page' => 12,
+                            'paged' => $cat_paged,
                             'tax_query' => array(
                                 array(
                                     'taxonomy' => 'product_cat',
@@ -264,12 +293,25 @@ get_header(); ?>
 
                         $category_query = new WP_Query($category_args);
 
-                        if ($category_query->have_posts()) :
-                            while ($category_query->have_posts()) : $category_query->the_post();
+                        if ($category_query->have_posts()) : ?>
+                        <div class="category-products-inner">
+                            <?php while ($category_query->have_posts()) : $category_query->the_post();
                                 global $product;
                                 ?>
                                 <div class="product-card">
                                     <div class="product-badges">
+                                        <?php
+                                        $product_badge = get_post_meta(get_the_ID(), '_product_badge', true);
+                                        if ($product_badge) :
+                                            $badge_labels = array(
+                                                'bestseller' => __('Bestseller', 'kacosmetics'),
+                                                'must-try' => __('Must Try', 'kacosmetics'),
+                                                'new' => __('New', 'kacosmetics'),
+                                            );
+                                            $label = isset($badge_labels[$product_badge]) ? $badge_labels[$product_badge] : ucfirst(str_replace('-', ' ', $product_badge));
+                                        ?>
+                                            <span class="badge badge-<?php echo esc_attr($product_badge); ?>"><?php echo esc_html($label); ?></span>
+                                        <?php endif; ?>
                                         <?php if (get_post_meta(get_the_ID(), '_is_new', true)) : ?>
                                             <span class="badge badge-new"><?php esc_html_e('New', 'kacosmetics'); ?></span>
                                         <?php endif; ?>
@@ -309,11 +351,30 @@ get_header(); ?>
                                 </div>
                                 <?php
                             endwhile;
-                            wp_reset_postdata();
-                        else :
-                            echo '<p class="no-products">' . sprintf(esc_html__('No products found in %s category.', 'kacosmetics'), esc_html($category->name)) . '</p>';
-                        endif;
-                        ?>
+                            ?>
+                        </div><!-- .category-products-inner -->
+
+                        <?php if ($category_query->max_num_pages > 1) : ?>
+                        <nav class="woocommerce-pagination category-pagination" data-category="<?php echo esc_attr($category->slug); ?>" data-max-pages="<?php echo esc_attr($category_query->max_num_pages); ?>">
+                            <?php
+                            $pagination_args = array(
+                                'total' => $category_query->max_num_pages,
+                                'current' => $cat_paged,
+                                'prev_text' => '&larr;',
+                                'next_text' => '&rarr;',
+                                'type' => 'list',
+                            );
+                            echo paginate_links($pagination_args);
+                            ?>
+                        </nav>
+                        <?php endif; ?>
+
+                        <?php wp_reset_postdata();
+                        else : ?>
+                        <div class="category-products-inner">
+                            <p class="no-products"><?php echo sprintf(esc_html__('No products found in %s category.', 'kacosmetics'), esc_html($category->name)); ?></p>
+                        </div>
+                        <?php endif; ?>
                     </div>
                     <?php
                 endforeach;

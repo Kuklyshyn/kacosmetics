@@ -60,6 +60,113 @@
 
         // Check hash on page load
         checkUrlHash();
+
+        // Initialize AJAX pagination for category tabs
+        initCategoryPagination();
+    }
+
+    function initCategoryPagination() {
+        // Handle pagination clicks in category grids
+        document.addEventListener('click', function(e) {
+            const link = e.target.closest('.category-pagination a.page-numbers');
+            if (!link) return;
+
+            e.preventDefault();
+
+            const pagination = link.closest('.category-pagination');
+            const category = pagination.getAttribute('data-category');
+            const grid = document.getElementById(category + '-products');
+
+            if (!grid) return;
+
+            // Get page number from link
+            let page = 1;
+
+            if (link.classList.contains('next')) {
+                const currentPage = parseInt(pagination.querySelector('.page-numbers.current')?.textContent) || 1;
+                page = currentPage + 1;
+            } else if (link.classList.contains('prev')) {
+                const currentPage = parseInt(pagination.querySelector('.page-numbers.current')?.textContent) || 1;
+                page = Math.max(1, currentPage - 1);
+            } else {
+                page = parseInt(link.textContent) || 1;
+            }
+
+            loadCategoryProducts(category, page, grid);
+        });
+    }
+
+    function loadCategoryProducts(category, page, grid) {
+        const productsInner = grid.querySelector('.category-products-inner');
+        const pagination = grid.querySelector('.category-pagination');
+
+        // Show loading state
+        grid.classList.add('loading');
+
+        // Build AJAX URL
+        const ajaxUrl = typeof kacCategoryAjax !== 'undefined' ? kacCategoryAjax.ajaxurl : '/wp-admin/admin-ajax.php';
+
+        const formData = new FormData();
+        formData.append('action', 'load_category_products');
+        formData.append('category', category);
+        formData.append('page', page);
+        formData.append('nonce', typeof kacCategoryAjax !== 'undefined' ? kacCategoryAjax.nonce : '');
+
+        // Add price filters if present
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('min_price')) {
+            formData.append('min_price', urlParams.get('min_price'));
+        }
+        if (urlParams.has('max_price')) {
+            formData.append('max_price', urlParams.get('max_price'));
+        }
+
+        fetch(ajaxUrl, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update products
+                if (productsInner) {
+                    productsInner.innerHTML = data.data.products;
+                } else {
+                    // Remove old product cards and pagination, then add new content
+                    const oldCards = grid.querySelectorAll('.product-card');
+                    const oldPagination = grid.querySelector('.category-pagination');
+                    oldCards.forEach(card => card.remove());
+                    if (oldPagination) oldPagination.remove();
+
+                    // Insert new products
+                    grid.insertAdjacentHTML('afterbegin', data.data.products);
+
+                    // Insert pagination at the end
+                    if (data.data.pagination) {
+                        const paginationNav = document.createElement('nav');
+                        paginationNav.className = 'woocommerce-pagination category-pagination';
+                        paginationNav.setAttribute('data-category', category);
+                        paginationNav.setAttribute('data-max-pages', data.data.max_pages);
+                        paginationNav.innerHTML = data.data.pagination;
+                        grid.appendChild(paginationNav);
+                    }
+                }
+
+                // Update pagination if it exists
+                if (pagination && data.data.pagination) {
+                    pagination.innerHTML = data.data.pagination;
+                }
+
+                // Scroll to top of grid
+                grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        })
+        .catch(error => {
+            console.error('Error loading products:', error);
+        })
+        .finally(() => {
+            grid.classList.remove('loading');
+        });
     }
 
     // Initialize when DOM is ready

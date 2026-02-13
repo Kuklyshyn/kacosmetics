@@ -9,7 +9,7 @@
 
 if ( ! defined( '_S_VERSION' ) ) {
 	// Replace the version number of the theme on each release.
-	define( '_S_VERSION', '2.2.4' );
+	define( '_S_VERSION', '2.2.6' );
 }
 
 /**
@@ -426,6 +426,12 @@ function kacosmetics_scripts() {
 	// Enqueue category tabs script for front page, New Arrivals template, shop page, category pages, and brand pages
 	if ( is_front_page() || is_page_template( 'template-new-arrivals.php' ) || is_shop() || is_post_type_archive( 'product' ) || is_product_category() || is_tax( 'product_brand' ) ) {
 		wp_enqueue_script( 'kacosmetics-category-tabs', get_template_directory_uri() . '/js/category-tabs.js', array(), _S_VERSION, true );
+
+		// Localize script for AJAX
+		wp_localize_script( 'kacosmetics-category-tabs', 'kacCategoryAjax', array(
+			'ajaxurl' => admin_url( 'admin-ajax.php' ),
+			'nonce'   => wp_create_nonce( 'kac_category_nonce' ),
+		) );
 	}
 
 	// Enqueue hero banner styles and script for front page
@@ -436,7 +442,32 @@ function kacosmetics_scripts() {
 
 	// Enqueue shop filters script for shop page, category pages, and brand pages
 	if ( is_shop() || is_post_type_archive( 'product' ) || is_product_category() || is_tax( 'product_brand' ) ) {
-		wp_enqueue_script( 'kacosmetics-shop-filters', get_template_directory_uri() . '/js/shop-filters.js', array( 'jquery' ), _S_VERSION, true );
+		// Enqueue WooCommerce price slider scripts
+		if ( function_exists( 'WC' ) ) {
+			wp_enqueue_script( 'wc-price-slider' );
+			wp_enqueue_script( 'jquery-ui-slider' );
+			wp_enqueue_script( 'jquery-ui-touch-punch' );
+
+			// Get min/max prices for the slider
+			global $wpdb;
+			$min_price = $wpdb->get_var( "SELECT MIN( CAST( meta_value AS DECIMAL(10,2) ) ) FROM {$wpdb->postmeta} WHERE meta_key = '_price' AND meta_value != ''" );
+			$max_price = $wpdb->get_var( "SELECT MAX( CAST( meta_value AS DECIMAL(10,2) ) ) FROM {$wpdb->postmeta} WHERE meta_key = '_price' AND meta_value != ''" );
+
+			$min_price = floor( $min_price );
+			$max_price = ceil( $max_price );
+
+			wp_localize_script( 'wc-price-slider', 'woocommerce_price_slider_params', array(
+				'currency_format_num_decimals' => 0,
+				'currency_format_symbol'       => get_woocommerce_currency_symbol(),
+				'currency_format_decimal_sep'  => wc_get_price_decimal_separator(),
+				'currency_format_thousand_sep' => wc_get_price_thousand_separator(),
+				'currency_format'              => str_replace( array( '%1$s', '%2$s' ), array( '%s', '%v' ), get_woocommerce_price_format() ),
+				'min_price'                    => isset( $_GET['min_price'] ) ? esc_attr( $_GET['min_price'] ) : $min_price,
+				'max_price'                    => isset( $_GET['max_price'] ) ? esc_attr( $_GET['max_price'] ) : $max_price,
+			) );
+		}
+
+		wp_enqueue_script( 'kacosmetics-shop-filters', get_template_directory_uri() . '/js/shop-filters.js', array( 'jquery', 'jquery-ui-slider' ), _S_VERSION, true );
 
 		// Pass WooCommerce settings to JavaScript
 		if ( function_exists( 'get_woocommerce_currency_symbol' ) ) {
@@ -1588,6 +1619,155 @@ add_action('woocommerce_process_product_meta', 'kacosmetics_save_badge_field');
 function kacosmetics_save_badge_field($post_id) {
     $badge = isset($_POST['_product_badge']) ? sanitize_text_field($_POST['_product_badge']) : '';
     update_post_meta($post_id, '_product_badge', $badge);
+}
+
+/**
+ * AJAX handler for loading category products with pagination
+ */
+add_action( 'wp_ajax_load_category_products', 'kac_load_category_products' );
+add_action( 'wp_ajax_nopriv_load_category_products', 'kac_load_category_products' );
+
+function kac_load_category_products() {
+    // Verify nonce
+    if ( ! wp_verify_nonce( $_POST['nonce'], 'kac_category_nonce' ) ) {
+        wp_send_json_error( 'Invalid nonce' );
+    }
+
+    $category = sanitize_text_field( $_POST['category'] );
+    $page = intval( $_POST['page'] );
+
+    if ( empty( $category ) || $page < 1 ) {
+        wp_send_json_error( 'Invalid parameters' );
+    }
+
+    $args = array(
+        'post_type'      => 'product',
+        'posts_per_page' => 12,
+        'paged'          => $page,
+        'tax_query'      => array(
+            array(
+                'taxonomy' => 'product_cat',
+                'field'    => 'slug',
+                'terms'    => $category,
+            ),
+        ),
+        'orderby' => 'date',
+        'order'   => 'DESC',
+    );
+
+    // Add price filter support
+    if ( isset( $_POST['min_price'] ) || isset( $_POST['max_price'] ) ) {
+        $args['meta_query'] = array( 'relation' => 'AND' );
+
+        if ( isset( $_POST['min_price'] ) && $_POST['min_price'] !== '' ) {
+            $args['meta_query'][] = array(
+                'key'     => '_price',
+                'value'   => floatval( $_POST['min_price'] ),
+                'compare' => '>=',
+                'type'    => 'NUMERIC',
+            );
+        }
+
+        if ( isset( $_POST['max_price'] ) && $_POST['max_price'] !== '' ) {
+            $args['meta_query'][] = array(
+                'key'     => '_price',
+                'value'   => floatval( $_POST['max_price'] ),
+                'compare' => '<=',
+                'type'    => 'NUMERIC',
+            );
+        }
+    }
+
+    $query = new WP_Query( $args );
+
+    ob_start();
+
+    if ( $query->have_posts() ) :
+        while ( $query->have_posts() ) :
+            $query->the_post();
+            global $product;
+            ?>
+            <div class="product-card">
+                <div class="product-badges">
+                    <?php
+                    $product_badge = get_post_meta( get_the_ID(), '_product_badge', true );
+                    if ( $product_badge ) :
+                        $badge_labels = array(
+                            'bestseller' => __( 'Bestseller', 'kacosmetics' ),
+                            'must-try'   => __( 'Must Try', 'kacosmetics' ),
+                            'new'        => __( 'New', 'kacosmetics' ),
+                        );
+                        $label = isset( $badge_labels[ $product_badge ] ) ? $badge_labels[ $product_badge ] : ucfirst( str_replace( '-', ' ', $product_badge ) );
+                        ?>
+                        <span class="badge badge-<?php echo esc_attr( $product_badge ); ?>"><?php echo esc_html( $label ); ?></span>
+                    <?php endif; ?>
+                    <?php if ( get_post_meta( get_the_ID(), '_is_new', true ) ) : ?>
+                        <span class="badge badge-new"><?php esc_html_e( 'New', 'kacosmetics' ); ?></span>
+                    <?php endif; ?>
+                    <?php if ( get_post_meta( get_the_ID(), '_is_exclusive', true ) ) : ?>
+                        <span class="badge badge-exclusive"><?php esc_html_e( 'Exclusive', 'kacosmetics' ); ?></span>
+                    <?php endif; ?>
+                </div>
+
+                <a href="<?php the_permalink(); ?>" class="product-image-link">
+                    <?php if ( has_post_thumbnail() ) : ?>
+                        <?php the_post_thumbnail( 'large', array( 'class' => 'product-image' ) ); ?>
+                    <?php else : ?>
+                        <div class="product-image placeholder-image"></div>
+                    <?php endif; ?>
+                </a>
+
+                <div class="product-info">
+                    <h3 class="product-title">
+                        <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
+                    </h3>
+                    <?php if ( $product && method_exists( $product, 'get_short_description' ) ) : ?>
+                        <p class="product-description"><?php echo wp_trim_words( $product->get_short_description(), 8 ); ?></p>
+                    <?php endif; ?>
+                    <?php if ( $product && method_exists( $product, 'get_price_html' ) ) : ?>
+                        <p class="product-price"><?php echo $product->get_price_html(); ?></p>
+                    <?php endif; ?>
+                </div>
+
+                <div class="product-actions">
+                    <button class="product-icon-button quick-shop" data-product-id="<?php echo get_the_ID(); ?>">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <path d="M3 5H13L12 13H4L3 5Z" stroke="currentColor" stroke-width="1"/>
+                            <path d="M6 5V3C6 2.44772 6.44772 2 7 2H9C9.55228 2 10 2.44772 10 3V5" stroke="currentColor" stroke-width="1"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <?php
+        endwhile;
+        wp_reset_postdata();
+    else :
+        $category_term = get_term_by( 'slug', $category, 'product_cat' );
+        $category_name = $category_term ? $category_term->name : $category;
+        echo '<p class="no-products">' . sprintf( esc_html__( 'No products found in %s category.', 'kacosmetics' ), esc_html( $category_name ) ) . '</p>';
+    endif;
+
+    $products_html = ob_get_clean();
+
+    // Generate pagination
+    ob_start();
+    if ( $query->max_num_pages > 1 ) {
+        echo paginate_links( array(
+            'total'     => $query->max_num_pages,
+            'current'   => $page,
+            'prev_text' => '&larr;',
+            'next_text' => '&rarr;',
+            'type'      => 'list',
+        ) );
+    }
+    $pagination_html = ob_get_clean();
+
+    wp_send_json_success( array(
+        'products'   => $products_html,
+        'pagination' => $pagination_html,
+        'max_pages'  => $query->max_num_pages,
+        'current'    => $page,
+    ) );
 }
 
 /**
