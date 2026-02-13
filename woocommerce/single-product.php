@@ -23,6 +23,26 @@ get_header(); ?>
 
 				<!-- Product Gallery -->
 				<div class="product-gallery-section">
+					<div class="product-badges-single">
+						<?php
+							$product_badge = get_post_meta(get_the_ID(), '_product_badge', true);
+							if ($product_badge) :
+								$badge_labels = array(
+									'bestseller' => __('Bestseller', 'kacosmetics'),
+									'must-try' => __('Must Try', 'kacosmetics'),
+									'new' => __('New', 'kacosmetics'),
+								);
+								$label = isset($badge_labels[$product_badge]) ? $badge_labels[$product_badge] : ucfirst(str_replace('-', ' ', $product_badge));
+							?>
+								<span class="badge badge-<?php echo esc_attr($product_badge); ?>"><?php echo esc_html($label); ?></span>
+							<?php endif; ?>
+							<?php if (get_post_meta(get_the_ID(), '_is_new', true)) : ?>
+								<span class="badge badge-new"><?php esc_html_e('New', 'kacosmetics'); ?></span>
+							<?php endif; ?>
+							<?php if (get_post_meta(get_the_ID(), '_is_exclusive', true)) : ?>
+								<span class="badge badge-exclusive"><?php esc_html_e('Exclusive', 'kacosmetics'); ?></span>
+							<?php endif; ?>
+						</div>
 					<?php
 					/**
 					 * Product images
@@ -34,6 +54,17 @@ get_header(); ?>
 						if ( $attachment_ids ) :
 						?>
 							<div class="product-main-image">
+								<?php
+								if ( $product_badge ) :
+									$badge_labels = array(
+										'bestseller' => __( 'Bestseller', 'kacosmetics' ),
+										'must-try'   => __( 'Must Try', 'kacosmetics' ),
+										'new'        => __( 'New', 'kacosmetics' ),
+									);
+									$label = isset( $badge_labels[ $product_badge ] ) ? $badge_labels[ $product_badge ] : ucfirst( str_replace( '-', ' ', $product_badge ) );
+								?>
+									<span class="product-badge badge-<?php echo esc_attr( $product_badge ); ?>"><?php echo esc_html( $label ); ?></span>
+								<?php endif; ?>
 								<?php echo wp_get_attachment_image( $attachment_ids[0], 'full', false, array('class' => 'main-product-img') ); ?>
 							</div>
 

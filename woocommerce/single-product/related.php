@@ -39,10 +39,25 @@ if ( $related_products ) : ?>
 						 */
 						?>
 						<div class="product-badges">
-							<?php if ( $product->is_on_sale() ) : ?>
-								<span class="badge badge-new">Sale</span>
-							<?php endif; ?>
-						</div>
+                                        <?php
+                                        $product_badge = get_post_meta(get_the_ID(), '_product_badge', true);
+                                        if ($product_badge) :
+                                            $badge_labels = array(
+                                                'bestseller' => __('Bestseller', 'kacosmetics'),
+                                                'must-try' => __('Must Try', 'kacosmetics'),
+                                                'new' => __('New', 'kacosmetics'),
+                                            );
+                                            $label = isset($badge_labels[$product_badge]) ? $badge_labels[$product_badge] : ucfirst(str_replace('-', ' ', $product_badge));
+                                        ?>
+                                            <span class="badge badge-<?php echo esc_attr($product_badge); ?>"><?php echo esc_html($label); ?></span>
+                                        <?php endif; ?>
+                                        <?php if (get_post_meta(get_the_ID(), '_is_new', true)) : ?>
+                                            <span class="badge badge-new"><?php esc_html_e('New', 'kacosmetics'); ?></span>
+                                        <?php endif; ?>
+                                        <?php if (get_post_meta(get_the_ID(), '_is_exclusive', true)) : ?>
+                                            <span class="badge badge-exclusive"><?php esc_html_e('Exclusive', 'kacosmetics'); ?></span>
+                                        <?php endif; ?>
+                                    </div>
 
 						<a href="<?php the_permalink(); ?>" class="product-image-link">
 							<?php if ( has_post_thumbnail() ) : ?>

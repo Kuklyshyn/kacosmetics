@@ -2172,6 +2172,15 @@ body.mobile-menu-open {
   align-self: flex-start;
 }
 
+.product-main-image .product-badge {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  padding: 8px 15px;
+  font-size: 12px;
+  z-index: 10;
+}
+
 .product-main-image {
   margin-bottom: 20px;
   overflow: hidden;
