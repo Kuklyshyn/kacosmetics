@@ -9,7 +9,7 @@
 
 if ( ! defined( '_S_VERSION' ) ) {
 	// Replace the version number of the theme on each release.
-	define( '_S_VERSION', '2.3.2' );
+	define( '_S_VERSION', '2.4.2' );
 
 }
 
@@ -217,9 +217,41 @@ function kac_custom_translations( $translated, $text, $domain ) {
 				'Exclusive'          => 'Ексклюзив',
 				'No products found.' => 'Товари не знайдено.',
 				'Buy'                => 'Купити',
+				// Product categories
+				'Vône'               => 'Парфуми',
+				'Starostlivosť O Pleť' => 'Догляд за обличчям',
+				'Starostlivosť O Telo' => 'Догляд за тілом',
+				'Starostlivosť o pleť' => 'Догляд за обличчям',
+				'Starostlivosť o telo' => 'Догляд за тілом',
 				// Product tabs
 				'Specifications'     => 'Характеристики',
 				'Composition'        => 'Склад',
+				// Footer
+				'Customer Service'   => 'Обслуговування клієнтів',
+				'Contact Us'         => 'Зв\'язатися з нами',
+				'Privacy Policy'     => 'Політика конфіденційності',
+				'Terms & Conditions' => 'Умови використання',
+				'Shipping & Delivery' => 'Доставка',
+				'Returns & Refunds'  => 'Повернення та обмін',
+				'My Account'         => 'Мій акаунт',
+				'Contact'            => 'Контакти',
+				'Secure Payment:'    => 'Безпечна оплата:',
+				'All rights reserved.' => 'Всі права захищені.',
+				'ID:'                => 'ІПН:',
+				'Tax ID:'            => 'ЄДРПОУ:',
+				'VAT:'               => 'ПДВ:',
+				'Privacy'            => 'Конфіденційність',
+				'Terms'              => 'Умови',
+				'Cookies'            => 'Cookies',
+				'Bestseller'         => 'Бестселер',
+				// 404 Page
+				'Page not found'     => 'Сторінку не знайдено',
+				'Sorry, the page you are looking for does not exist or has been moved.' => 'Вибачте, сторінка, яку ви шукаєте, не існує або була переміщена.',
+				'Go to Homepage'     => 'Перейти на головну',
+				'Browse Products'    => 'Переглянути товари',
+				'Or try searching:'  => 'Або спробуйте пошук:',
+				// Footer
+				'Developed by'       => 'Розроблено',
 			);
 			if ( isset( $translations[ $text ] ) ) {
 				return $translations[ $text ];
@@ -240,6 +272,32 @@ function kac_custom_translations( $translated, $text, $domain ) {
 				// Product tabs
 				'Specifications'     => 'Vlastnosti',
 				'Composition'        => 'Zloženie',
+				// Footer
+				'Customer Service'   => 'Zákaznícky servis',
+				'Contact Us'         => 'Kontaktujte nás',
+				'Privacy Policy'     => 'Ochrana súkromia',
+				'Terms & Conditions' => 'Obchodné podmienky',
+				'Shipping & Delivery' => 'Doprava a doručenie',
+				'Returns & Refunds'  => 'Vrátenie a výmena',
+				'My Account'         => 'Môj účet',
+				'Contact'            => 'Kontakt',
+				'Secure Payment:'    => 'Bezpečná platba:',
+				'All rights reserved.' => 'Všetky práva vyhradené.',
+				'ID:'                => 'IČO:',
+				'Tax ID:'            => 'DIČ:',
+				'VAT:'               => 'IČ DPH:',
+				'Privacy'            => 'Súkromie',
+				'Terms'              => 'Podmienky',
+				'Cookies'            => 'Cookies',
+				'Bestseller'         => 'Bestseller',
+				// 404 Page
+				'Page not found'     => 'Stránka nenájdená',
+				'Sorry, the page you are looking for does not exist or has been moved.' => 'Prepáčte, stránka, ktorú hľadáte, neexistuje alebo bola presunutá.',
+				'Go to Homepage'     => 'Prejsť na hlavnú',
+				'Browse Products'    => 'Prehliadať produkty',
+				'Or try searching:'  => 'Alebo skúste hľadať:',
+				// Footer
+				'Developed by'       => 'Vytvoril',
 			);
 			if ( isset( $translations[ $text ] ) ) {
 				return $translations[ $text ];
