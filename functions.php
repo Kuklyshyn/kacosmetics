@@ -9,7 +9,8 @@
 
 if ( ! defined( '_S_VERSION' ) ) {
 	// Replace the version number of the theme on each release.
-	define( '_S_VERSION', '2.2.7' );
+	define( '_S_VERSION', '2.3.2' );
+
 }
 
 /**
@@ -438,6 +439,7 @@ function kacosmetics_scripts() {
 	if ( is_front_page() ) {
 		wp_enqueue_style( 'kacosmetics-hero-banner', get_template_directory_uri() . '/css/hero-banner.css', array(), _S_VERSION );
 		wp_enqueue_script( 'kacosmetics-hero-banner', get_template_directory_uri() . '/js/hero-banner.js', array(), _S_VERSION, true );
+		wp_enqueue_script( 'kacosmetics-bestseller-slider', get_template_directory_uri() . '/js/bestseller-slider.js', array(), _S_VERSION, true );
 	}
 
 	// Enqueue shop filters script for shop page, category pages, and brand pages

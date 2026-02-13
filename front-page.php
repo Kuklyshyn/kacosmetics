@@ -96,6 +96,85 @@ if (!empty($hero_slides)) :
 <?php endif; ?>
 
 <?php
+// Bestseller Products Slider
+$bestseller_query = new WP_Query(array(
+    'post_type'      => 'product',
+    'posts_per_page' => 12,
+    'meta_query'     => array(
+        array(
+            'key'   => '_product_badge',
+            'value' => 'bestseller',
+        ),
+    ),
+    'orderby' => 'date',
+    'order'   => 'DESC',
+));
+
+if ($bestseller_query->have_posts()) :
+?>
+<section class="bestseller-slider-section">
+    <div class="bestseller-slider-container">
+        <h2 class="bestseller-slider-title"><?php esc_html_e('Bestseller', 'kacosmetics'); ?></h2>
+
+        <div class="bestseller-slider-wrapper">
+            <div class="bestseller-slider-overflow">
+            <div class="bestseller-slider">
+                <?php while ($bestseller_query->have_posts()) : $bestseller_query->the_post();
+                    global $product;
+                ?>
+                    <div class="bestseller-slide">
+                        <div class="product-card">
+                            <div class="product-badges">
+                                <span class="badge badge-bestseller"><?php esc_html_e('Bestseller', 'kacosmetics'); ?></span>
+                            </div>
+
+                            <a href="<?php the_permalink(); ?>" class="product-image-link">
+                                <?php if (has_post_thumbnail()) : ?>
+                                    <?php the_post_thumbnail('large', array('class' => 'product-image')); ?>
+                                <?php else : ?>
+                                    <div class="product-image placeholder-image"></div>
+                                <?php endif; ?>
+                            </a>
+
+                            <div class="product-info">
+                                <h3 class="product-title">
+                                    <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
+                                </h3>
+                                <?php if ($product && method_exists($product, 'get_short_description')) : ?>
+                                    <p class="product-description"><?php echo wp_trim_words($product->get_short_description(), 8); ?></p>
+                                <?php endif; ?>
+                                <?php if ($product && method_exists($product, 'get_price_html')) : ?>
+                                    <p class="product-price"><?php echo $product->get_price_html(); ?></p>
+                                <?php endif; ?>
+                            </div>
+
+                            <div class="product-actions">
+                                <button class="product-icon-button quick-shop" data-product-id="<?php echo get_the_ID(); ?>">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                        <path d="M3 5H13L12 13H4L3 5Z" stroke="currentColor" stroke-width="1"/>
+                                        <path d="M6 5V3C6 2.44772 6.44772 2 7 2H9C9.55228 2 10 2.44772 10 3V5" stroke="currentColor" stroke-width="1"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                <?php endwhile; wp_reset_postdata(); ?>
+            </div>
+            </div><!-- .bestseller-slider-overflow -->
+
+            <!-- Slider Navigation -->
+            <button class="bestseller-nav bestseller-nav-prev" aria-label="<?php esc_attr_e('Previous', 'kacosmetics'); ?>">
+                <svg viewBox="0 0 24 24" width="24" height="24"><polyline points="15,18 9,12 15,6" fill="none" stroke="currentColor" stroke-width="2"></polyline></svg>
+            </button>
+            <button class="bestseller-nav bestseller-nav-next" aria-label="<?php esc_attr_e('Next', 'kacosmetics'); ?>">
+                <svg viewBox="0 0 24 24" width="24" height="24"><polyline points="9,6 15,12 9,18" fill="none" stroke="currentColor" stroke-width="2"></polyline></svg>
+            </button>
+        </div>
+    </div>
+</section>
+<?php endif; ?>
+
+<?php
 // Get top-level product categories that have products
 $categories = get_terms(array(
     'taxonomy'   => 'product_cat',
