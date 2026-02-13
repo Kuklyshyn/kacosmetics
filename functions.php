@@ -82,6 +82,118 @@ add_filter( 'locale', 'kac_polylang_wc_locale', 100 );
 add_filter( 'plugin_locale', 'kac_polylang_wc_locale', 100 );
 
 /**
+ * Map Ukrainian category names to Slovak slugs
+ * Since categories may not be properly linked in Polylang, we use a manual mapping
+ */
+function kac_get_category_slug_mapping() {
+	return array(
+		// Ukrainian slug => Slovak slug
+		'догляд-за-тілом'       => 'starostlivost-o-telo',
+		'догляд-за-обличчям'    => 'starostlivost-o-plet',
+		'догляд-за-шкірою'      => 'starostlivost-o-plet',
+		'парфуми'               => 'vone',
+		// URL-decoded versions (just in case)
+		'%D0%B4%D0%BE%D0%B3%D0%BB%D1%8F%D0%B4-%D0%B7%D0%B0-%D1%82%D1%96%D0%BB%D0%BE%D0%BC' => 'starostlivost-o-telo',
+		// Additional variations
+		'dohliad-za-tilom'      => 'starostlivost-o-telo',
+		'dohliad-za-oblychchiam'=> 'starostlivost-o-plet',
+		'dohliad-za-shkiroju'   => 'starostlivost-o-plet',
+		'parfumy'               => 'vone',
+	);
+}
+
+/**
+ * Normalize slug for comparison (handle URL encoding and case)
+ */
+function kac_normalize_slug( $slug ) {
+	$slug = urldecode( $slug );
+	$slug = strtolower( $slug );
+	$slug = trim( $slug );
+	return $slug;
+}
+
+/**
+ * Get the default language (Slovak) version of a category term
+ * This helps when products are only in Slovak but we need to query them from Ukrainian pages
+ */
+function kac_get_default_lang_category( $term ) {
+	if ( ! function_exists( 'pll_default_language' ) || ! function_exists( 'pll_current_language' ) ) {
+		return $term;
+	}
+
+	$default_lang = pll_default_language();
+	$current_lang = pll_current_language();
+
+	// If already in default language, return as is
+	if ( $current_lang === $default_lang ) {
+		return $term;
+	}
+
+	// First try Polylang translation
+	if ( function_exists( 'pll_get_term' ) ) {
+		$default_term_id = pll_get_term( $term->term_id, $default_lang );
+
+		if ( $default_term_id && $default_term_id !== $term->term_id ) {
+			$default_term = get_term( $default_term_id, 'product_cat' );
+			if ( $default_term && ! is_wp_error( $default_term ) ) {
+				return $default_term;
+			}
+		}
+	}
+
+	// Fallback to manual mapping
+	$mapping = kac_get_category_slug_mapping();
+	$term_slug = strtolower( $term->slug );
+
+	if ( isset( $mapping[ $term_slug ] ) ) {
+		$slovak_term = get_term_by( 'slug', $mapping[ $term_slug ], 'product_cat' );
+		if ( $slovak_term && ! is_wp_error( $slovak_term ) ) {
+			return $slovak_term;
+		}
+	}
+
+	return $term;
+}
+
+/**
+ * Get default language category slug from any language category slug
+ */
+function kac_get_default_lang_category_slug( $slug ) {
+	// First check manual mapping
+	$mapping = kac_get_category_slug_mapping();
+	$normalized_slug = kac_normalize_slug( $slug );
+
+	// Check direct match
+	if ( isset( $mapping[ $normalized_slug ] ) ) {
+		return $mapping[ $normalized_slug ];
+	}
+
+	// Check all mapping keys with normalization
+	foreach ( $mapping as $ua_slug => $sk_slug ) {
+		if ( kac_normalize_slug( $ua_slug ) === $normalized_slug ) {
+			return $sk_slug;
+		}
+	}
+
+	if ( ! function_exists( 'pll_get_term' ) || ! function_exists( 'pll_default_language' ) ) {
+		return $slug;
+	}
+
+	// Get term by slug
+	$term = get_term_by( 'slug', $slug, 'product_cat' );
+	if ( ! $term ) {
+		// Try URL-decoded slug
+		$term = get_term_by( 'slug', urldecode( $slug ), 'product_cat' );
+	}
+	if ( ! $term ) {
+		return $slug;
+	}
+
+	$default_term = kac_get_default_lang_category( $term );
+	return $default_term->slug;
+}
+
+/**
  * Force product_brand taxonomy to use "brands" slug for all languages
  */
 function kac_fix_brand_taxonomy_slug() {
@@ -216,6 +328,7 @@ function kac_custom_translations( $translated, $text, $domain ) {
 				'New'                => 'Новинка',
 				'Exclusive'          => 'Ексклюзив',
 				'No products found.' => 'Товари не знайдено.',
+				'No products found in this category.' => 'У цій категорії товари не знайдено.',
 				'Buy'                => 'Купити',
 				// Product categories
 				'Vône'               => 'Парфуми',
@@ -268,6 +381,7 @@ function kac_custom_translations( $translated, $text, $domain ) {
 				'New'                => 'Novinka',
 				'Exclusive'          => 'Exkluzívne',
 				'No products found.' => 'Neboli nájdené žiadne produkty.',
+				'No products found in this category.' => 'V tejto kategórii neboli nájdené žiadne produkty.',
 				'Buy'                => 'Kúpiť',
 				// Product tabs
 				'Specifications'     => 'Vlastnosti',
@@ -310,6 +424,28 @@ add_filter( 'gettext', 'kac_custom_translations', 999, 3 );
 add_filter( 'gettext_woocommerce', 'kac_custom_translations', 999, 3 );
 add_filter( 'gettext_woo-gutenberg-products-block', 'kac_custom_translations', 999, 3 );
 add_filter( 'gettext_kacosmetics', 'kac_custom_translations', 999, 3 );
+
+/**
+ * Translate category names (for use in templates)
+ */
+function kac_translate_category_name( $name ) {
+	if ( function_exists( 'pll_current_language' ) && pll_current_language() === 'ua' ) {
+		$translations = array(
+			'Vône'                 => 'Парфуми',
+			'vône'                 => 'Парфуми',
+			'VÔNE'                 => 'Парфуми',
+			'Starostlivosť o pleť' => 'Догляд за обличчям',
+			'Starostlivosť O Pleť' => 'Догляд за обличчям',
+			'Starostlivosť o telo' => 'Догляд за тілом',
+			'Starostlivosť O Telo' => 'Догляд за тілом',
+		);
+
+		if ( isset( $translations[ $name ] ) ) {
+			return $translations[ $name ];
+		}
+	}
+	return $name;
+}
 
 /**
  * Translate WooCommerce Block strings
@@ -1700,6 +1836,9 @@ function kac_load_category_products() {
         wp_send_json_error( 'Invalid parameters' );
     }
 
+    // Get default language category slug for querying products
+    $query_slug = kac_get_default_lang_category_slug( $category );
+
     $args = array(
         'post_type'      => 'product',
         'posts_per_page' => 12,
@@ -1708,7 +1847,7 @@ function kac_load_category_products() {
             array(
                 'taxonomy' => 'product_cat',
                 'field'    => 'slug',
-                'terms'    => $category,
+                'terms'    => $query_slug,
             ),
         ),
         'orderby' => 'date',
@@ -1802,9 +1941,7 @@ function kac_load_category_products() {
         endwhile;
         wp_reset_postdata();
     else :
-        $category_term = get_term_by( 'slug', $category, 'product_cat' );
-        $category_name = $category_term ? $category_term->name : $category;
-        echo '<p class="no-products">' . sprintf( esc_html__( 'No products found in %s category.', 'kacosmetics' ), esc_html( $category_name ) ) . '</p>';
+        echo '<p class="no-products">' . esc_html__( 'No products found in this category.', 'kacosmetics' ) . '</p>';
     endif;
 
     $products_html = ob_get_clean();

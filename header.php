@@ -47,7 +47,7 @@
 					));
 					if ($mobile_categories && !is_wp_error($mobile_categories)) :
 						foreach ($mobile_categories as $cat) : ?>
-							<li><a href="<?php echo esc_url(get_term_link($cat)); ?>"><?php echo esc_html($cat->name); ?></a></li>
+							<li><a href="<?php echo esc_url(get_term_link($cat)); ?>"><?php echo esc_html( kac_translate_category_name( $cat->name ) ); ?></a></li>
 						<?php endforeach;
 					endif;
 					?>

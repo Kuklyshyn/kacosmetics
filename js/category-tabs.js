@@ -32,13 +32,23 @@
                 const targetGrid = document.getElementById(category + '-products');
                 if (targetGrid) {
                     targetGrid.classList.add('active');
+
+                    // Scroll to products container smoothly
+                    const productsContainer = document.querySelector('.products-container');
+                    if (productsContainer) {
+                        setTimeout(function() {
+                            productsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }, 100);
+                    }
                 }
 
-                // Update URL hash without scrolling
-                if (history.pushState) {
-                    history.pushState(null, null, '#' + category);
-                } else {
-                    window.location.hash = '#' + category;
+                // Update URL - remove paged parameter and add hash
+                const url = new URL(window.location.href);
+                url.searchParams.delete('paged'); // Remove page parameter when switching tabs
+                url.hash = category;
+
+                if (history.replaceState) {
+                    history.replaceState(null, null, url.toString());
                 }
             });
         });
@@ -47,9 +57,18 @@
         function checkUrlHash() {
             const hash = window.location.hash.substring(1); // Remove #
 
-            if (hash) {
+            if (hash && hash !== 'all') {
                 const targetButton = document.querySelector('[data-category="' + hash + '"]');
                 if (targetButton) {
+                    // If there's a paged parameter, remove it since we're going to a category
+                    const url = new URL(window.location.href);
+                    if (url.searchParams.has('paged')) {
+                        url.searchParams.delete('paged');
+                        if (history.replaceState) {
+                            history.replaceState(null, null, url.toString());
+                        }
+                    }
+
                     targetButton.click();
                 }
             }
@@ -98,7 +117,6 @@
 
     function loadCategoryProducts(category, page, grid) {
         const productsInner = grid.querySelector('.category-products-inner');
-        const pagination = grid.querySelector('.category-pagination');
 
         // Show loading state
         grid.classList.add('loading');
@@ -106,9 +124,12 @@
         // Build AJAX URL
         const ajaxUrl = typeof kacCategoryAjax !== 'undefined' ? kacCategoryAjax.ajaxurl : '/wp-admin/admin-ajax.php';
 
+        // Use query-slug if available (for multilingual support), otherwise use category
+        const querySlug = grid.getAttribute('data-query-slug') || category;
+
         const formData = new FormData();
         formData.append('action', 'load_category_products');
-        formData.append('category', category);
+        formData.append('category', querySlug);
         formData.append('page', page);
         formData.append('nonce', typeof kacCategoryAjax !== 'undefined' ? kacCategoryAjax.nonce : '');
 
@@ -140,9 +161,18 @@
 
                     // Insert new products
                     grid.insertAdjacentHTML('afterbegin', data.data.products);
+                }
 
-                    // Insert pagination at the end
-                    if (data.data.pagination) {
+                // Handle pagination - update or remove
+                const existingPagination = grid.querySelector('.category-pagination');
+
+                if (data.data.pagination && data.data.max_pages > 1) {
+                    // There are multiple pages - show pagination
+                    if (existingPagination) {
+                        existingPagination.innerHTML = data.data.pagination;
+                        existingPagination.style.display = '';
+                    } else {
+                        // Create new pagination
                         const paginationNav = document.createElement('nav');
                         paginationNav.className = 'woocommerce-pagination category-pagination';
                         paginationNav.setAttribute('data-category', category);
@@ -150,11 +180,11 @@
                         paginationNav.innerHTML = data.data.pagination;
                         grid.appendChild(paginationNav);
                     }
-                }
-
-                // Update pagination if it exists
-                if (pagination && data.data.pagination) {
-                    pagination.innerHTML = data.data.pagination;
+                } else {
+                    // No pagination needed - hide or remove existing
+                    if (existingPagination) {
+                        existingPagination.style.display = 'none';
+                    }
                 }
 
                 // Scroll to top of grid

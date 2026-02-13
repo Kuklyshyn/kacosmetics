@@ -29,7 +29,7 @@ get_header(); ?>
                     </button>
                     <?php foreach ($product_categories as $index => $category) : ?>
                         <button class="tab-button" data-category="<?php echo esc_attr($category->slug); ?>">
-                            <?php echo esc_html($category->name); ?>
+                            <?php echo esc_html( kac_translate_category_name( $category->name ) ); ?>
                         </button>
                     <?php endforeach; ?>
                 </div>
@@ -249,9 +249,13 @@ get_header(); ?>
                 foreach ($product_categories as $category) :
                     // Get page number for this category from URL
                     $cat_paged = isset($_GET['cat_page_' . $category->slug]) ? intval($_GET['cat_page_' . $category->slug]) : 1;
+
+                    // Get default language category for querying products
+                    $default_lang_category = kac_get_default_lang_category($category);
+                    $query_slug = $default_lang_category->slug;
                     ?>
                     <!-- <?php echo esc_html($category->name); ?> Products -->
-                    <div class="products-grid" id="<?php echo esc_attr($category->slug); ?>-products" data-category="<?php echo esc_attr($category->slug); ?>">
+                    <div class="products-grid" id="<?php echo esc_attr($category->slug); ?>-products" data-category="<?php echo esc_attr($category->slug); ?>" data-query-slug="<?php echo esc_attr($query_slug); ?>">
                         <?php
                         $category_args = array(
                             'post_type' => 'product',
@@ -261,7 +265,7 @@ get_header(); ?>
                                 array(
                                     'taxonomy' => 'product_cat',
                                     'field' => 'slug',
-                                    'terms' => $category->slug
+                                    'terms' => $query_slug
                                 )
                             ),
                             'orderby' => 'date',
@@ -372,7 +376,7 @@ get_header(); ?>
                         <?php wp_reset_postdata();
                         else : ?>
                         <div class="category-products-inner">
-                            <p class="no-products"><?php echo sprintf(esc_html__('No products found in %s category.', 'kacosmetics'), esc_html($category->name)); ?></p>
+                            <p class="no-products"><?php esc_html_e('No products found in this category.', 'kacosmetics'); ?></p>
                         </div>
                         <?php endif; ?>
                     </div>
