@@ -247,9 +247,6 @@ get_header(); ?>
             // Create product grids for each category
             if ($product_categories && !is_wp_error($product_categories)) :
                 foreach ($product_categories as $category) :
-                    // Get page number for this category from URL
-                    $cat_paged = isset($_GET['cat_page_' . $category->slug]) ? intval($_GET['cat_page_' . $category->slug]) : 1;
-
                     // Get default language category for querying products
                     $default_lang_category = kac_get_default_lang_category($category);
                     $query_slug = $default_lang_category->slug;
@@ -259,8 +256,7 @@ get_header(); ?>
                         <?php
                         $category_args = array(
                             'post_type' => 'product',
-                            'posts_per_page' => 12,
-                            'paged' => $cat_paged,
+                            'posts_per_page' => -1, // Show all products in category
                             'tax_query' => array(
                                 array(
                                     'taxonomy' => 'product_cat',
@@ -357,21 +353,6 @@ get_header(); ?>
                             endwhile;
                             ?>
                         </div><!-- .category-products-inner -->
-
-                        <?php if ($category_query->max_num_pages > 1) : ?>
-                        <nav class="woocommerce-pagination category-pagination" data-category="<?php echo esc_attr($category->slug); ?>" data-max-pages="<?php echo esc_attr($category_query->max_num_pages); ?>">
-                            <?php
-                            $pagination_args = array(
-                                'total' => $category_query->max_num_pages,
-                                'current' => $cat_paged,
-                                'prev_text' => '&larr;',
-                                'next_text' => '&rarr;',
-                                'type' => 'list',
-                            );
-                            echo paginate_links($pagination_args);
-                            ?>
-                        </nav>
-                        <?php endif; ?>
 
                         <?php wp_reset_postdata();
                         else : ?>

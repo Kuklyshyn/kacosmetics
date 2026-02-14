@@ -365,6 +365,21 @@ function kac_custom_translations( $translated, $text, $domain ) {
 				'Or try searching:'  => 'Або спробуйте пошук:',
 				// Footer
 				'Developed by'       => 'Розроблено',
+				// Cookie Consent
+				'Privacy Settings'   => 'Налаштування конфіденційності',
+				'On our website and in the application, we use cookies and SDK (Software Development Kit) tools. Some of them are necessary, while others help us improve this website and your user experience. For ad personalization, we process personal data together with our partners using cookies and advertising identifiers. We also use these technologies for non-personalized advertising. Do you agree to the use of cookies and SDK tools?' => 'На нашому веб-сайті та в додатку ми використовуємо файли cookie та інструменти SDK (Software Development Kit). Деякі з них необхідні, тоді як інші допомагають нам покращити цей веб-сайт та ваш користувацький досвід. Для персоналізації реклами ми обробляємо персональні дані разом з нашими партнерами за допомогою файлів cookie та рекламних ідентифікаторів. Ми також використовуємо ці технології для неперсоналізованої реклами. Чи погоджуєтесь ви на використання файлів cookie та інструментів SDK?',
+				'Cookie Information' => 'Інформація про cookies',
+				'Accept and continue' => 'Прийняти та продовжити',
+				'Cookie Settings'    => 'Налаштування cookie',
+				'Only necessary cookies' => 'Тільки необхідні cookies',
+				'Necessary cookies'  => 'Необхідні cookies',
+				'(Required)'         => '(Обов\'язково)',
+				'These cookies are essential for the website to function properly.' => 'Ці файли cookie необхідні для належного функціонування веб-сайту.',
+				'Analytics cookies'  => 'Аналітичні cookies',
+				'These cookies help us understand how visitors interact with our website.' => 'Ці файли cookie допомагають нам зрозуміти, як відвідувачі взаємодіють з нашим веб-сайтом.',
+				'Marketing cookies'  => 'Маркетингові cookies',
+				'These cookies are used to show you relevant ads and track their effectiveness.' => 'Ці файли cookie використовуються для показу вам релевантної реклами та відстеження її ефективності.',
+				'Save settings'      => 'Зберегти налаштування',
 			);
 			if ( isset( $translations[ $text ] ) ) {
 				return $translations[ $text ];
@@ -412,6 +427,21 @@ function kac_custom_translations( $translated, $text, $domain ) {
 				'Or try searching:'  => 'Alebo skúste hľadať:',
 				// Footer
 				'Developed by'       => 'Vytvoril',
+				// Cookie Consent
+				'Privacy Settings'   => 'Nastavenie súkromia',
+				'On our website and in the application, we use cookies and SDK (Software Development Kit) tools. Some of them are necessary, while others help us improve this website and your user experience. For ad personalization, we process personal data together with our partners using cookies and advertising identifiers. We also use these technologies for non-personalized advertising. Do you agree to the use of cookies and SDK tools?' => 'Na našich webových stránkach a v aplikácii používame súbory cookies a nástroje SDK (Software Development Kit). Niektoré z nich sú nevyhnutné, zatiaľ čo iné nám pomáhajú vylepšiť tento web a váš používateľský zážitok. Na personalizáciu reklám spracúvame spolu s našimi partnermi osobné údaje pomocou súborov cookie a reklamných identifikátorov. Tieto technológie používame aj na nepersonalizované reklamy. Súhlasíte s používaním súborov cookies a nástrojov SDK?',
+				'Cookie Information' => 'Informácie o súboroch cookies',
+				'Accept and continue' => 'Súhlasím a pokračovať',
+				'Cookie Settings'    => 'Podrobné nastavenie cookies',
+				'Only necessary cookies' => 'Iba nevyhnutné cookies',
+				'Necessary cookies'  => 'Nevyhnutné cookies',
+				'(Required)'         => '(Povinné)',
+				'These cookies are essential for the website to function properly.' => 'Tieto súbory cookie sú nevyhnutné pre správne fungovanie webovej stránky.',
+				'Analytics cookies'  => 'Analytické cookies',
+				'These cookies help us understand how visitors interact with our website.' => 'Tieto súbory cookie nám pomáhajú pochopiť, ako návštevníci interagujú s našou webovou stránkou.',
+				'Marketing cookies'  => 'Marketingové cookies',
+				'These cookies are used to show you relevant ads and track their effectiveness.' => 'Tieto súbory cookie sa používajú na zobrazovanie relevantných reklám a sledovanie ich účinnosti.',
+				'Save settings'      => 'Uložiť nastavenia',
 			);
 			if ( isset( $translations[ $text ] ) ) {
 				return $translations[ $text ];
@@ -617,6 +647,9 @@ function kacosmetics_scripts() {
 
 	// Enqueue banner script
 	wp_enqueue_script( 'kacosmetics-banner', get_template_directory_uri() . '/js/banner.js', array(), _S_VERSION, true );
+
+	// Enqueue cookie consent script (GDPR compliance)
+	wp_enqueue_script( 'kacosmetics-cookie-consent', get_template_directory_uri() . '/js/cookie-consent.js', array(), _S_VERSION, true );
 
 	// Enqueue category tabs script for front page, New Arrivals template, shop page, category pages, and brand pages
 	if ( is_front_page() || is_page_template( 'template-new-arrivals.php' ) || is_shop() || is_post_type_archive( 'product' ) || is_product_category() || is_tax( 'product_brand' ) ) {
@@ -1227,6 +1260,95 @@ function kacosmetics_contact_customizer($wp_customize) {
 	));
 }
 add_action('customize_register', 'kacosmetics_contact_customizer');
+
+/**
+ * Legal Pages Customizer Settings
+ */
+function kacosmetics_legal_pages_customizer($wp_customize) {
+	// Section
+	$wp_customize->add_section('kacosmetics_legal_pages', array(
+		'title' => __('Legal Pages', 'kacosmetics'),
+		'priority' => 35,
+		'description' => __('Select pages for legal links in footer', 'kacosmetics'),
+	));
+
+	// Privacy Policy Page
+	$wp_customize->add_setting('kacosmetics_privacy_page', array(
+		'default' => '',
+		'sanitize_callback' => 'absint',
+	));
+	$wp_customize->add_control('kacosmetics_privacy_page', array(
+		'label' => __('Privacy Policy Page', 'kacosmetics'),
+		'section' => 'kacosmetics_legal_pages',
+		'type' => 'dropdown-pages',
+	));
+
+	// Terms & Conditions Page
+	$wp_customize->add_setting('kacosmetics_terms_page', array(
+		'default' => '',
+		'sanitize_callback' => 'absint',
+	));
+	$wp_customize->add_control('kacosmetics_terms_page', array(
+		'label' => __('Terms & Conditions Page', 'kacosmetics'),
+		'section' => 'kacosmetics_legal_pages',
+		'type' => 'dropdown-pages',
+	));
+
+	// Cookies Page
+	$wp_customize->add_setting('kacosmetics_cookies_page', array(
+		'default' => '',
+		'sanitize_callback' => 'absint',
+	));
+	$wp_customize->add_control('kacosmetics_cookies_page', array(
+		'label' => __('Cookies Page', 'kacosmetics'),
+		'section' => 'kacosmetics_legal_pages',
+		'type' => 'dropdown-pages',
+	));
+
+	// Shipping & Delivery Page
+	$wp_customize->add_setting('kacosmetics_shipping_page', array(
+		'default' => '',
+		'sanitize_callback' => 'absint',
+	));
+	$wp_customize->add_control('kacosmetics_shipping_page', array(
+		'label' => __('Shipping & Delivery Page', 'kacosmetics'),
+		'section' => 'kacosmetics_legal_pages',
+		'type' => 'dropdown-pages',
+	));
+
+	// Returns & Refunds Page
+	$wp_customize->add_setting('kacosmetics_returns_page', array(
+		'default' => '',
+		'sanitize_callback' => 'absint',
+	));
+	$wp_customize->add_control('kacosmetics_returns_page', array(
+		'label' => __('Returns & Refunds Page', 'kacosmetics'),
+		'section' => 'kacosmetics_legal_pages',
+		'type' => 'dropdown-pages',
+	));
+}
+add_action('customize_register', 'kacosmetics_legal_pages_customizer');
+
+/**
+ * Get legal page URL with Polylang support
+ */
+function kac_get_legal_page_url($setting_name) {
+	$page_id = get_theme_mod($setting_name, '');
+
+	if (empty($page_id)) {
+		return '';
+	}
+
+	// Get translated page if Polylang is active
+	if (function_exists('pll_get_post')) {
+		$translated_id = pll_get_post($page_id);
+		if ($translated_id) {
+			$page_id = $translated_id;
+		}
+	}
+
+	return get_permalink($page_id);
+}
 
 /**
  * Register Customizer strings for Polylang translation

@@ -199,7 +199,7 @@ if (is_wp_error($categories)) {
                 <div class="category-tabs">
                     <?php foreach ($categories as $index => $cat) : ?>
                         <button class="tab-button<?php echo $index === 0 ? ' active' : ''; ?>" data-category="<?php echo esc_attr($cat->slug); ?>">
-                            <?php echo esc_html($cat->name); ?>
+                            <?php echo esc_html( kac_translate_category_name( $cat->name ) ); ?>
                         </button>
                     <?php endforeach; ?>
                 </div>
@@ -283,7 +283,7 @@ if (is_wp_error($categories)) {
                             wp_reset_postdata();
                         else :
                         ?>
-                            <p class="no-products"><?php printf(esc_html__('No products found in %s category.', 'kacosmetics'), esc_html($cat->name)); ?></p>
+                            <p class="no-products"><?php esc_html_e('No products found in this category.', 'kacosmetics'); ?></p>
                         <?php endif; ?>
                     </div>
                 <?php endforeach; ?>

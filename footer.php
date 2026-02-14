@@ -92,10 +92,10 @@ $footer_categories = get_terms(array(
                 <h4 class="footer-title"><?php esc_html_e('Customer Service', 'kacosmetics'); ?></h4>
                 <ul class="footer-links">
                     <li><a href="<?php echo esc_url(kac_get_contact_page_url()); ?>"><?php esc_html_e('Contact Us', 'kacosmetics'); ?></a></li>
-                    <li><a href="<?php echo esc_url(get_privacy_policy_url()); ?>"><?php esc_html_e('Privacy Policy', 'kacosmetics'); ?></a></li>
-                    <li><a href="<?php echo esc_url(wc_get_page_permalink('terms')); ?>"><?php esc_html_e('Terms & Conditions', 'kacosmetics'); ?></a></li>
-                    <li><a href="<?php echo esc_url(kac_url('shipping-delivery/')); ?>"><?php esc_html_e('Shipping & Delivery', 'kacosmetics'); ?></a></li>
-                    <li><a href="<?php echo esc_url(kac_url('returns-refunds/')); ?>"><?php esc_html_e('Returns & Refunds', 'kacosmetics'); ?></a></li>
+                    <li><a href="<?php echo esc_url(kac_get_legal_page_url('kacosmetics_privacy_page')); ?>"><?php esc_html_e('Privacy Policy', 'kacosmetics'); ?></a></li>
+                    <li><a href="<?php echo esc_url(kac_get_legal_page_url('kacosmetics_terms_page')); ?>"><?php esc_html_e('Terms & Conditions', 'kacosmetics'); ?></a></li>
+                    <li><a href="<?php echo esc_url(kac_get_legal_page_url('kacosmetics_shipping_page')); ?>"><?php esc_html_e('Shipping & Delivery', 'kacosmetics'); ?></a></li>
+                    <li><a href="<?php echo esc_url(kac_get_legal_page_url('kacosmetics_returns_page')); ?>"><?php esc_html_e('Returns & Refunds', 'kacosmetics'); ?></a></li>
                     <li><a href="<?php echo esc_url(wc_get_page_permalink('myaccount')); ?>"><?php esc_html_e('My Account', 'kacosmetics'); ?></a></li>
                 </ul>
             </div>
@@ -176,9 +176,9 @@ $footer_categories = get_terms(array(
                 <?php endif; ?>
             </div>
             <div class="footer-bottom-links">
-                <a href="<?php echo esc_url(get_privacy_policy_url()); ?>"><?php esc_html_e('Privacy', 'kacosmetics'); ?></a>
-                <a href="<?php echo esc_url(wc_get_page_permalink('terms')); ?>"><?php esc_html_e('Terms', 'kacosmetics'); ?></a>
-                <a href="<?php echo esc_url(kac_url('cookies/')); ?>"><?php esc_html_e('Cookies', 'kacosmetics'); ?></a>
+                <a href="<?php echo esc_url(kac_get_legal_page_url('kacosmetics_privacy_page')); ?>"><?php esc_html_e('Privacy', 'kacosmetics'); ?></a>
+                <a href="<?php echo esc_url(kac_get_legal_page_url('kacosmetics_terms_page')); ?>"><?php esc_html_e('Terms', 'kacosmetics'); ?></a>
+                <a href="<?php echo esc_url(kac_get_legal_page_url('kacosmetics_cookies_page')); ?>"><?php esc_html_e('Cookies', 'kacosmetics'); ?></a>
             </div>
             <div class="footer-developed-by">
                 <?php esc_html_e('Developed by', 'kacosmetics'); ?> <a href="https://omnicode.sk/sk" target="_blank" rel="noopener noreferrer">Omnicode</a>
@@ -188,6 +188,62 @@ $footer_categories = get_terms(array(
 
 </footer><!-- #colophon -->
 </div><!-- #page -->
+
+<!-- Cookie Consent Banner -->
+<div id="cookie-consent-banner" class="cookie-consent-banner" style="display: none;">
+    <div class="cookie-consent-overlay"></div>
+    <div class="cookie-consent-dialog">
+        <h2 class="cookie-consent-title"><?php esc_html_e('Privacy Settings', 'kacosmetics'); ?></h2>
+        <div class="cookie-consent-text">
+            <p><?php esc_html_e('On our website and in the application, we use cookies and SDK (Software Development Kit) tools. Some of them are necessary, while others help us improve this website and your user experience. For ad personalization, we process personal data together with our partners using cookies and advertising identifiers. We also use these technologies for non-personalized advertising. Do you agree to the use of cookies and SDK tools?', 'kacosmetics'); ?></p>
+        </div>
+        <a href="<?php echo esc_url(kac_get_legal_page_url('kacosmetics_cookies_page')); ?>" class="cookie-consent-link"><?php esc_html_e('Cookie Information', 'kacosmetics'); ?></a>
+        <div class="cookie-consent-buttons">
+            <button type="button" id="cookie-accept-all" class="cookie-btn cookie-btn-accept">
+                <?php esc_html_e('Accept and continue', 'kacosmetics'); ?>
+            </button>
+            <button type="button" id="cookie-settings-toggle" class="cookie-btn cookie-btn-settings">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                </svg>
+                <?php esc_html_e('Cookie Settings', 'kacosmetics'); ?>
+            </button>
+            <button type="button" id="cookie-reject-all" class="cookie-btn cookie-btn-reject">
+                <?php esc_html_e('Only necessary cookies', 'kacosmetics'); ?>
+            </button>
+        </div>
+
+        <!-- Detailed Cookie Settings (hidden by default) -->
+        <div id="cookie-settings-panel" class="cookie-settings-panel" style="display: none;">
+            <div class="cookie-category">
+                <label class="cookie-category-label">
+                    <input type="checkbox" id="cookie-necessary" checked disabled>
+                    <span class="cookie-category-name"><?php esc_html_e('Necessary cookies', 'kacosmetics'); ?></span>
+                    <span class="cookie-category-required"><?php esc_html_e('(Required)', 'kacosmetics'); ?></span>
+                </label>
+                <p class="cookie-category-desc"><?php esc_html_e('These cookies are essential for the website to function properly.', 'kacosmetics'); ?></p>
+            </div>
+            <div class="cookie-category">
+                <label class="cookie-category-label">
+                    <input type="checkbox" id="cookie-analytics">
+                    <span class="cookie-category-name"><?php esc_html_e('Analytics cookies', 'kacosmetics'); ?></span>
+                </label>
+                <p class="cookie-category-desc"><?php esc_html_e('These cookies help us understand how visitors interact with our website.', 'kacosmetics'); ?></p>
+            </div>
+            <div class="cookie-category">
+                <label class="cookie-category-label">
+                    <input type="checkbox" id="cookie-marketing">
+                    <span class="cookie-category-name"><?php esc_html_e('Marketing cookies', 'kacosmetics'); ?></span>
+                </label>
+                <p class="cookie-category-desc"><?php esc_html_e('These cookies are used to show you relevant ads and track their effectiveness.', 'kacosmetics'); ?></p>
+            </div>
+            <button type="button" id="cookie-save-settings" class="cookie-btn cookie-btn-save">
+                <?php esc_html_e('Save settings', 'kacosmetics'); ?>
+            </button>
+        </div>
+    </div>
+</div>
 
 <?php wp_footer(); ?>
 
