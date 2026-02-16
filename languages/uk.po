@@ -200,3 +200,11 @@ msgstr "Про нас"
 #: page-contact.php
 msgid "Follow us:"
 msgstr "Слідкуйте за нами:"
+
+#: footer.php, page-faq.php
+msgid "FAQ"
+msgstr "Часті запитання"
+
+#: page-faq.php
+msgid "No FAQ items found."
+msgstr "Питання не знайдено."

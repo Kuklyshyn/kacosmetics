@@ -9,7 +9,7 @@
 
 if ( ! defined( '_S_VERSION' ) ) {
 	// Replace the version number of the theme on each release.
-	define( '_S_VERSION', '2.4.2' );
+	define( '_S_VERSION', '2.4.7' );
 
 }
 
@@ -2304,3 +2304,295 @@ function kacosmetics_meta_pixel_purchase($order_id) {
     </script>
     <?php
 }
+
+/**
+ * FAQ Custom Post Type
+ */
+
+// Register FAQ post type
+function kacosmetics_register_faq_post_type() {
+    $labels = array(
+        'name'                  => _x('FAQ', 'Post type general name', 'kacosmetics'),
+        'singular_name'         => _x('FAQ', 'Post type singular name', 'kacosmetics'),
+        'menu_name'             => _x('FAQ', 'Admin Menu text', 'kacosmetics'),
+        'name_admin_bar'        => _x('FAQ', 'Add New on Toolbar', 'kacosmetics'),
+        'add_new'               => __('Add New', 'kacosmetics'),
+        'add_new_item'          => __('Add New Question', 'kacosmetics'),
+        'new_item'              => __('New Question', 'kacosmetics'),
+        'edit_item'             => __('Edit Question', 'kacosmetics'),
+        'view_item'             => __('View Question', 'kacosmetics'),
+        'all_items'             => __('All Questions', 'kacosmetics'),
+        'search_items'          => __('Search Questions', 'kacosmetics'),
+        'not_found'             => __('No questions found.', 'kacosmetics'),
+        'not_found_in_trash'    => __('No questions found in Trash.', 'kacosmetics'),
+    );
+
+    $args = array(
+        'labels'             => $labels,
+        'public'             => false,
+        'publicly_queryable' => false,
+        'show_ui'            => true,
+        'show_in_menu'       => true,
+        'query_var'          => false,
+        'capability_type'    => 'post',
+        'has_archive'        => false,
+        'hierarchical'       => false,
+        'menu_position'      => 25,
+        'menu_icon'          => 'dashicons-editor-help',
+        'supports'           => array('title', 'editor', 'page-attributes'),
+        'show_in_rest'       => true,
+    );
+
+    register_post_type('faq', $args);
+}
+add_action('init', 'kacosmetics_register_faq_post_type');
+
+// Register FAQ Category taxonomy
+function kacosmetics_register_faq_taxonomy() {
+    $labels = array(
+        'name'              => _x('FAQ Categories', 'taxonomy general name', 'kacosmetics'),
+        'singular_name'     => _x('FAQ Category', 'taxonomy singular name', 'kacosmetics'),
+        'search_items'      => __('Search Categories', 'kacosmetics'),
+        'all_items'         => __('All Categories', 'kacosmetics'),
+        'parent_item'       => __('Parent Category', 'kacosmetics'),
+        'parent_item_colon' => __('Parent Category:', 'kacosmetics'),
+        'edit_item'         => __('Edit Category', 'kacosmetics'),
+        'update_item'       => __('Update Category', 'kacosmetics'),
+        'add_new_item'      => __('Add New Category', 'kacosmetics'),
+        'new_item_name'     => __('New Category Name', 'kacosmetics'),
+        'menu_name'         => __('Categories', 'kacosmetics'),
+    );
+
+    $args = array(
+        'hierarchical'      => true,
+        'labels'            => $labels,
+        'show_ui'           => true,
+        'show_admin_column' => true,
+        'query_var'         => false,
+        'show_in_rest'      => true,
+    );
+
+    register_taxonomy('faq_category', array('faq'), $args);
+}
+add_action('init', 'kacosmetics_register_faq_taxonomy');
+
+// Add order column to FAQ admin
+function kacosmetics_faq_admin_columns($columns) {
+    $new_columns = array();
+    foreach ($columns as $key => $value) {
+        $new_columns[$key] = $value;
+        if ($key === 'title') {
+            $new_columns['faq_order'] = __('Order', 'kacosmetics');
+        }
+    }
+    return $new_columns;
+}
+add_filter('manage_faq_posts_columns', 'kacosmetics_faq_admin_columns');
+
+function kacosmetics_faq_admin_column_content($column, $post_id) {
+    if ($column === 'faq_order') {
+        $order = get_post_field('menu_order', $post_id);
+        echo esc_html($order);
+    }
+}
+add_action('manage_faq_posts_custom_column', 'kacosmetics_faq_admin_column_content', 10, 2);
+
+// Make order column sortable
+function kacosmetics_faq_sortable_columns($columns) {
+    $columns['faq_order'] = 'menu_order';
+    return $columns;
+}
+add_filter('manage_edit-faq_sortable_columns', 'kacosmetics_faq_sortable_columns');
+
+// FAQ Shortcode [kacosmetics_faq]
+function kacosmetics_faq_shortcode($atts) {
+    $atts = shortcode_atts(array(
+        'category' => '',
+        'limit'    => -1,
+    ), $atts, 'kacosmetics_faq');
+
+    $args = array(
+        'post_type'      => 'faq',
+        'posts_per_page' => intval($atts['limit']),
+        'orderby'        => 'menu_order',
+        'order'          => 'ASC',
+        'post_status'    => 'publish',
+    );
+
+    if (!empty($atts['category'])) {
+        $args['tax_query'] = array(
+            array(
+                'taxonomy' => 'faq_category',
+                'field'    => 'slug',
+                'terms'    => $atts['category'],
+            ),
+        );
+    }
+
+    $faq_query = new WP_Query($args);
+
+    if (!$faq_query->have_posts()) {
+        return '<p>' . esc_html__('No FAQ items found.', 'kacosmetics') . '</p>';
+    }
+
+    ob_start();
+    ?>
+    <div class="faq-accordion">
+        <?php while ($faq_query->have_posts()) : $faq_query->the_post(); ?>
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false">
+                    <span class="faq-question-text"><?php the_title(); ?></span>
+                    <span class="faq-icon">
+                        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </span>
+                </button>
+                <div class="faq-answer">
+                    <div class="faq-answer-content">
+                        <?php the_content(); ?>
+                    </div>
+                </div>
+            </div>
+        <?php endwhile; wp_reset_postdata(); ?>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+add_shortcode('kacosmetics_faq', 'kacosmetics_faq_shortcode');
+
+// Get FAQ items grouped by category
+function kacosmetics_get_faq_by_categories() {
+    // Get current language for Polylang
+    $lang = function_exists('pll_current_language') ? pll_current_language() : '';
+
+    $categories = get_terms(array(
+        'taxonomy'   => 'faq_category',
+        'hide_empty' => true,
+        'orderby'    => 'name',
+        'order'      => 'ASC',
+    ));
+
+    $result = array();
+
+    if (!is_wp_error($categories) && !empty($categories)) {
+        foreach ($categories as $category) {
+            $args = array(
+                'post_type'        => 'faq',
+                'posts_per_page'   => -1,
+                'orderby'          => 'menu_order',
+                'order'            => 'ASC',
+                'post_status'      => 'publish',
+                'suppress_filters' => false, // Enable Polylang filtering
+                'tax_query'        => array(
+                    array(
+                        'taxonomy' => 'faq_category',
+                        'field'    => 'term_id',
+                        'terms'    => $category->term_id,
+                    ),
+                ),
+            );
+
+            // Add language filter if Polylang is active
+            if ($lang) {
+                $args['lang'] = $lang;
+            }
+
+            $faqs = get_posts($args);
+
+            if (!empty($faqs)) {
+                $result[] = array(
+                    'category' => $category,
+                    'faqs'     => $faqs,
+                );
+            }
+        }
+    }
+
+    // Also get uncategorized FAQs
+    $uncategorized_args = array(
+        'post_type'        => 'faq',
+        'posts_per_page'   => -1,
+        'orderby'          => 'menu_order',
+        'order'            => 'ASC',
+        'post_status'      => 'publish',
+        'suppress_filters' => false, // Enable Polylang filtering
+        'tax_query'        => array(
+            array(
+                'taxonomy' => 'faq_category',
+                'operator' => 'NOT EXISTS',
+            ),
+        ),
+    );
+
+    if ($lang) {
+        $uncategorized_args['lang'] = $lang;
+    }
+
+    $uncategorized = get_posts($uncategorized_args);
+
+    if (!empty($uncategorized)) {
+        array_unshift($result, array(
+            'category' => null,
+            'faqs'     => $uncategorized,
+        ));
+    }
+
+    return $result;
+}
+
+// Enqueue FAQ scripts
+function kacosmetics_faq_scripts() {
+    global $post;
+
+    $load_faq = false;
+
+    // Check if FAQ page template
+    if (is_page_template('page-faq.php')) {
+        $load_faq = true;
+    }
+
+    // Check if page has FAQ shortcode
+    if ($post && has_shortcode($post->post_content, 'kacosmetics_faq')) {
+        $load_faq = true;
+    }
+
+    if ($load_faq) {
+        wp_enqueue_script(
+            'kacosmetics-faq',
+            get_template_directory_uri() . '/js/faq.js',
+            array('jquery'),
+            _S_VERSION,
+            true
+        );
+    }
+}
+add_action('wp_enqueue_scripts', 'kacosmetics_faq_scripts');
+
+// Add FAQ to Customizer Legal Pages section
+function kacosmetics_faq_customizer($wp_customize) {
+    $wp_customize->add_setting('kacosmetics_faq_page', array(
+        'default'           => '',
+        'sanitize_callback' => 'absint',
+    ));
+
+    $wp_customize->add_control('kacosmetics_faq_page', array(
+        'label'       => __('FAQ Page', 'kacosmetics'),
+        'section'     => 'kacosmetics_legal_pages',
+        'type'        => 'dropdown-pages',
+    ));
+}
+add_action('customize_register', 'kacosmetics_faq_customizer');
+
+// Enable Polylang support for FAQ
+function kacosmetics_faq_polylang_support($post_types) {
+    $post_types['faq'] = 'faq';
+    return $post_types;
+}
+add_filter('pll_get_post_types', 'kacosmetics_faq_polylang_support');
+
+function kacosmetics_faq_category_polylang_support($taxonomies) {
+    $taxonomies['faq_category'] = 'faq_category';
+    return $taxonomies;
+}
+add_filter('pll_get_taxonomies', 'kacosmetics_faq_category_polylang_support');
