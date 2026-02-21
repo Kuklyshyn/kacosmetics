@@ -60,14 +60,18 @@ $page_excerpt = has_excerpt() ? get_the_excerpt() : '';
 </div>
 
 <script>
-jQuery(function($) {
-    $('.faq-question').on('click', function(e) {
+(function($) {
+    if (window.faqInitialized) return;
+    window.faqInitialized = true;
+
+    $(document).on('click', '.faq-question', function(e) {
         e.preventDefault();
+        e.stopPropagation();
+
         var $item = $(this).closest('.faq-item');
         var $answer = $item.find('.faq-answer');
-        var isOpen = $item.hasClass('active');
 
-        if (isOpen) {
+        if ($item.hasClass('active')) {
             $item.removeClass('active');
             $(this).attr('aria-expanded', 'false');
             $answer.slideUp(300);
@@ -77,7 +81,7 @@ jQuery(function($) {
             $answer.slideDown(300);
         }
     });
-});
+})(jQuery);
 </script>
 
 <?php

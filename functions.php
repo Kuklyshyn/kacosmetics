@@ -9,7 +9,7 @@
 
 if ( ! defined( '_S_VERSION' ) ) {
 	// Replace the version number of the theme on each release.
-	define( '_S_VERSION', '2.4.7' );
+	define( '_S_VERSION', '2.4.8' );
 
 }
 
@@ -2257,6 +2257,66 @@ function kacosmetics_meta_pixel_initiate_checkout() {
     <?php
 }
 
+// AddPaymentInfo event when clicking "Place Order" button
+add_action('wp_footer', 'kacosmetics_meta_pixel_add_payment_info');
+function kacosmetics_meta_pixel_add_payment_info() {
+    $pixel_id = get_theme_mod('meta_pixel_id', '');
+
+    if (empty($pixel_id) || !is_checkout() || is_order_received_page()) {
+        return;
+    }
+
+    $cart = WC()->cart;
+    if (!$cart) {
+        return;
+    }
+
+    $product_ids = array();
+    $contents = array();
+
+    foreach ($cart->get_cart() as $cart_item) {
+        $product_ids[] = $cart_item['product_id'];
+        $contents[] = array(
+            'id' => $cart_item['product_id'],
+            'quantity' => $cart_item['quantity'],
+        );
+    }
+    ?>
+    <script>
+    (function($) {
+        $(document).ready(function() {
+            // Track when user clicks "Place Order" button
+            $('form.checkout').on('submit', function() {
+                fbq('track', 'AddPaymentInfo', {
+                    content_ids: <?php echo json_encode($product_ids); ?>,
+                    contents: <?php echo json_encode($contents); ?>,
+                    content_type: 'product',
+                    num_items: <?php echo esc_js($cart->get_cart_contents_count()); ?>,
+                    value: <?php echo esc_js($cart->get_cart_contents_total()); ?>,
+                    currency: '<?php echo esc_js(get_woocommerce_currency()); ?>'
+                });
+            });
+
+            // Also track on place_order button click (for AJAX checkout)
+            $(document).on('click', '#place_order', function() {
+                if ($('form.checkout').hasClass('processing')) {
+                    return; // Already tracked via form submit
+                }
+                fbq('track', 'AddPaymentInfo', {
+                    content_ids: <?php echo json_encode($product_ids); ?>,
+                    contents: <?php echo json_encode($contents); ?>,
+                    content_type: 'product',
+                    num_items: <?php echo esc_js($cart->get_cart_contents_count()); ?>,
+                    value: <?php echo esc_js($cart->get_cart_contents_total()); ?>,
+                    currency: '<?php echo esc_js(get_woocommerce_currency()); ?>'
+                });
+            });
+        });
+    })(jQuery);
+    </script>
+    <?php
+}
+
 // Purchase event on thank you page
 add_action('woocommerce_thankyou', 'kacosmetics_meta_pixel_purchase', 10, 1);
 function kacosmetics_meta_pixel_purchase($order_id) {
@@ -2541,33 +2601,7 @@ function kacosmetics_get_faq_by_categories() {
     return $result;
 }
 
-// Enqueue FAQ scripts
-function kacosmetics_faq_scripts() {
-    global $post;
-
-    $load_faq = false;
-
-    // Check if FAQ page template
-    if (is_page_template('page-faq.php')) {
-        $load_faq = true;
-    }
-
-    // Check if page has FAQ shortcode
-    if ($post && has_shortcode($post->post_content, 'kacosmetics_faq')) {
-        $load_faq = true;
-    }
-
-    if ($load_faq) {
-        wp_enqueue_script(
-            'kacosmetics-faq',
-            get_template_directory_uri() . '/js/faq.js',
-            array('jquery'),
-            _S_VERSION,
-            true
-        );
-    }
-}
-add_action('wp_enqueue_scripts', 'kacosmetics_faq_scripts');
+// FAQ scripts are loaded inline in page-faq.php template
 
 // Add FAQ to Customizer Legal Pages section
 function kacosmetics_faq_customizer($wp_customize) {
