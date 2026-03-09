@@ -1670,21 +1670,25 @@ function kacosmetics_get_hero_slides() {
 	return $slides;
 }
 
-// Автоматично вибрати безкоштовну доставку (PHP - працює для блокового Cart)
-add_filter( 'woocommerce_package_rates', 'auto_select_free_shipping', 100, 2 );
-function auto_select_free_shipping( $rates, $package ) {
-    // Шукаємо безкоштовну доставку
-    $free_shipping = array();
-
+// Приховати платну доставку коли доступна безкоштовна (опціонально)
+add_filter( 'woocommerce_package_rates', 'hide_paid_shipping_when_free_available', 100, 2 );
+function hide_paid_shipping_when_free_available( $rates, $package ) {
+    // Перевіряємо чи є безкоштовна доставка
+    $has_free_shipping = false;
     foreach ( $rates as $rate_id => $rate ) {
         if ( 'free_shipping' === $rate->method_id || 0 == $rate->cost ) {
-            $free_shipping[ $rate_id ] = $rate;
+            $has_free_shipping = true;
+            break;
         }
     }
 
-    // Якщо є безкоштовна доставка - повертаємо тільки її
-    if ( ! empty( $free_shipping ) ) {
-        return $free_shipping;
+    // Якщо є безкоштовна - приховуємо Flat Rate (залишаємо free shipping і local pickup)
+    if ( $has_free_shipping ) {
+        foreach ( $rates as $rate_id => $rate ) {
+            if ( 'flat_rate' === $rate->method_id && $rate->cost > 0 ) {
+                unset( $rates[ $rate_id ] );
+            }
+        }
     }
 
     return $rates;
