@@ -1670,38 +1670,24 @@ function kacosmetics_get_hero_slides() {
 	return $slides;
 }
 
-// Автоматично вибрати безкоштовну доставку
-add_action( 'wp_footer', 'force_free_shipping_default', 999 );
-function force_free_shipping_default() {
-    if ( is_cart() || is_checkout() ) {
-        ?>
-        <script>
-        jQuery(document).ready(function($){
-            function selectFreeShipping() {
-                // Шукаємо всі radio buttons з доставкою
-                var freeShip = $('input[type="radio"]').filter(function() {
-                    var label = $(this).closest('label').text().toLowerCase();
-                    return label.includes('free') || label.includes('безкоштовн');
-                });
-                
-                if (freeShip.length > 0 && !freeShip.is(':checked')) {
-                    freeShip.first().prop('checked', true).trigger('change');
-                    $('body').trigger('update_checkout');
-                }
-            }
-            
-            // Виконати зараз
-            selectFreeShipping();
-            
-            // При оновленні кошика/checkout
-            $(document.body).on('updated_cart_totals updated_checkout', selectFreeShipping);
-            
-            // Додатково через пів секунди
-            setTimeout(selectFreeShipping, 500);
-        });
-        </script>
-        <?php
+// Автоматично вибрати безкоштовну доставку (PHP - працює для блокового Cart)
+add_filter( 'woocommerce_package_rates', 'auto_select_free_shipping', 100, 2 );
+function auto_select_free_shipping( $rates, $package ) {
+    // Шукаємо безкоштовну доставку
+    $free_shipping = array();
+
+    foreach ( $rates as $rate_id => $rate ) {
+        if ( 'free_shipping' === $rate->method_id || 0 == $rate->cost ) {
+            $free_shipping[ $rate_id ] = $rate;
+        }
     }
+
+    // Якщо є безкоштовна доставка - повертаємо тільки її
+    if ( ! empty( $free_shipping ) ) {
+        return $free_shipping;
+    }
+
+    return $rates;
 }
 
 // Автоматично вибрати самовивіз (Local Pickup)
@@ -2630,3 +2616,85 @@ function kacosmetics_faq_category_polylang_support($taxonomies) {
     return $taxonomies;
 }
 add_filter('pll_get_taxonomies', 'kacosmetics_faq_category_polylang_support');
+
+/**
+ * Auto-generate SEO title and description for brand pages
+ */
+
+// Auto SEO title for brand pages
+function kacosmetics_brand_seo_title($title) {
+    if (is_tax('product_brand')) {
+        $term = get_queried_object();
+        if ($term && isset($term->name)) {
+            $site_name = get_bloginfo('name');
+            return $term->name . ' | ' . $site_name;
+        }
+    }
+    return $title;
+}
+add_filter('pre_get_document_title', 'kacosmetics_brand_seo_title', 999);
+add_filter('wpseo_title', 'kacosmetics_brand_seo_title', 999);
+add_filter('wpseo_opengraph_title', 'kacosmetics_brand_seo_title', 999);
+
+// Disable Yoast title rewrite for brand pages
+function kacosmetics_brand_disable_yoast_title($title_parts) {
+    if (is_tax('product_brand')) {
+        $term = get_queried_object();
+        if ($term && isset($term->name)) {
+            $title_parts['title'] = $term->name;
+        }
+    }
+    return $title_parts;
+}
+add_filter('document_title_parts', 'kacosmetics_brand_disable_yoast_title', 999);
+
+// Auto meta description for brand pages
+function kacosmetics_brand_meta_description() {
+    if (is_tax('product_brand')) {
+        $term = get_queried_object();
+        if ($term && isset($term->name)) {
+            $description = '';
+
+            // Use term description if available
+            if (!empty($term->description)) {
+                $description = wp_strip_all_tags($term->description);
+            } else {
+                // Generate default description
+                $description = sprintf(
+                    __('Discover %s products at %s. Shop our collection of premium beauty products from %s.', 'kacosmetics'),
+                    $term->name,
+                    get_bloginfo('name'),
+                    $term->name
+                );
+            }
+
+            // Limit to 160 characters
+            if (strlen($description) > 160) {
+                $description = substr($description, 0, 157) . '...';
+            }
+
+            echo '<meta name="description" content="' . esc_attr($description) . '">' . "\n";
+        }
+    }
+}
+add_action('wp_head', 'kacosmetics_brand_meta_description', 1);
+
+// Override Yoast meta description for brand pages
+function kacosmetics_brand_yoast_metadesc($description) {
+    if (is_tax('product_brand')) {
+        $term = get_queried_object();
+        if ($term && isset($term->name)) {
+            if (!empty($term->description)) {
+                return wp_strip_all_tags($term->description);
+            }
+            return sprintf(
+                __('Discover %s products at %s. Shop our collection of premium beauty products from %s.', 'kacosmetics'),
+                $term->name,
+                get_bloginfo('name'),
+                $term->name
+            );
+        }
+    }
+    return $description;
+}
+add_filter('wpseo_metadesc', 'kacosmetics_brand_yoast_metadesc', 20);
