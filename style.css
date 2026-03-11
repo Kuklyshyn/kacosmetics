@@ -1173,6 +1173,154 @@ body {
   font-weight: bold;
 }
 
+/* Search Overlay */
+.search-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  background: #fff;
+  z-index: 99999;
+  display: none;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 120px;
+  box-sizing: border-box;
+}
+
+.search-overlay.active {
+  display: flex;
+}
+
+.search-overlay-container {
+  width: 100%;
+  max-width: 600px;
+  padding: 0 20px;
+  text-align: center;
+}
+
+.search-overlay-close {
+  position: fixed;
+  top: 30px;
+  right: 30px;
+  background: none;
+  border: none;
+  color: #000;
+  font-size: 32px;
+  cursor: pointer;
+  padding: 10px;
+  line-height: 1;
+  transition: opacity 0.3s;
+  font-weight: 300;
+}
+
+.search-overlay-close:hover {
+  opacity: 0.5;
+}
+
+.search-overlay-title {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #000;
+  margin-bottom: 30px;
+  font-weight: 400;
+}
+
+.search-overlay-form {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #000;
+  padding-bottom: 15px;
+}
+
+.search-overlay-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #000;
+  font-size: 18px;
+  padding: 10px 0;
+  outline: none;
+  font-family: inherit;
+  text-align: center;
+  letter-spacing: 1px;
+}
+
+.search-overlay-input::placeholder {
+  color: #999;
+}
+
+.search-overlay-submit {
+  background: none;
+  border: none;
+  color: #000;
+  cursor: pointer;
+  padding: 10px;
+  transition: opacity 0.3s;
+}
+
+.search-overlay-submit:hover {
+  opacity: 0.5;
+}
+
+body.search-open {
+  overflow: hidden;
+}
+
+/* Search Autocomplete Results */
+.search-result-item:hover {
+  background: #f9f9f9;
+}
+
+.search-result-item:last-child {
+  border-bottom: none;
+}
+
+.search-loading {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #eee;
+  border-top-color: #000;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 768px) {
+  .search-overlay {
+    padding-top: 80px;
+  }
+
+  .search-overlay-input {
+    font-size: 16px;
+  }
+
+  .search-overlay-close {
+    top: 20px;
+    right: 20px;
+    font-size: 28px;
+  }
+
+  .search-result-item {
+    padding: 12px 0 !important;
+  }
+
+  .search-result-item > div:first-child {
+    width: 50px !important;
+    height: 50px !important;
+  }
+}
+
 /* Mobile Menu Sidebar */
 .mobile-menu-overlay {
   position: fixed;

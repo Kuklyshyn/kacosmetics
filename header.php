@@ -19,6 +19,26 @@
 
 <body <?php body_class(); ?>>
 <?php wp_body_open(); ?>
+
+<!-- Search Overlay -->
+<div class="search-overlay" id="search-overlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;width:100%;height:100%;background:#fff;z-index:99999;align-items:flex-start;justify-content:center;padding-top:100px;overflow-y:auto;" aria-hidden="true">
+	<button class="search-overlay-close" aria-label="<?php esc_attr_e('Close search', 'kacosmetics'); ?>" style="position:fixed;top:30px;right:30px;background:none;border:none;font-size:32px;cursor:pointer;padding:10px;color:#000;z-index:100000;">&times;</button>
+	<div class="search-overlay-container" style="width:100%;max-width:600px;padding:0 20px;text-align:center;">
+		<p class="search-overlay-title" style="font-size:12px;text-transform:uppercase;letter-spacing:2px;color:#000;margin-bottom:30px;"><?php esc_html_e('Search', 'kacosmetics'); ?></p>
+		<form role="search" method="get" class="search-overlay-form" action="<?php echo esc_url(home_url('/')); ?>" style="display:flex;align-items:center;border-bottom:1px solid #000;padding-bottom:15px;">
+			<input type="search" class="search-overlay-input" id="search-autocomplete-input" placeholder="<?php esc_attr_e('What are you looking for?', 'kacosmetics'); ?>" value="<?php echo get_search_query(); ?>" name="s" autocomplete="off" style="flex:1;background:transparent;border:none;color:#000;font-size:18px;padding:10px 0;outline:none;text-align:center;" />
+			<input type="hidden" name="post_type" value="product" />
+			<button type="submit" class="search-overlay-submit" aria-label="<?php esc_attr_e('Search', 'kacosmetics'); ?>" style="background:none;border:none;color:#000;cursor:pointer;padding:10px;">
+				<svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+					<circle cx="9" cy="9" r="7" stroke="currentColor" stroke-width="1.5"/>
+					<path d="M14 14L18 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+				</svg>
+			</button>
+		</form>
+		<div class="search-autocomplete-results" id="search-autocomplete-results" style="display:none;margin-top:30px;text-align:left;"></div>
+	</div>
+</div>
+
 <div id="page" class="site">
 	<a class="skip-link screen-reader-text" href="#primary"><?php esc_html_e('Skip to content', 'kacosmetics'); ?></a>
 

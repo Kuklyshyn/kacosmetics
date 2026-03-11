@@ -363,6 +363,12 @@ function kac_custom_translations( $translated, $text, $domain ) {
 				'Go to Homepage'     => 'Перейти на головну',
 				'Browse Products'    => 'Переглянути товари',
 				'Or try searching:'  => 'Або спробуйте пошук:',
+				// Search
+				'Search'             => 'Пошук',
+				'What are you looking for?' => 'Що ви шукаєте?',
+				'Close search'       => 'Закрити пошук',
+				'No products found'  => 'Товари не знайдено',
+				'View all results'   => 'Переглянути всі результати',
 				// Footer
 				'Developed by'       => 'Розроблено',
 				// Cookie Consent
@@ -425,6 +431,12 @@ function kac_custom_translations( $translated, $text, $domain ) {
 				'Go to Homepage'     => 'Prejsť na hlavnú',
 				'Browse Products'    => 'Prehliadať produkty',
 				'Or try searching:'  => 'Alebo skúste hľadať:',
+				// Search
+				'Search'             => 'Vyhľadávanie',
+				'What are you looking for?' => 'Čo hľadáte?',
+				'Close search'       => 'Zavrieť vyhľadávanie',
+				'No products found'  => 'Produkty neboli nájdené',
+				'View all results'   => 'Zobraziť všetky výsledky',
 				// Footer
 				'Developed by'       => 'Vytvoril',
 				// Cookie Consent
@@ -647,6 +659,14 @@ function kacosmetics_scripts() {
 
 	// Enqueue banner script
 	wp_enqueue_script( 'kacosmetics-banner', get_template_directory_uri() . '/js/banner.js', array(), _S_VERSION, true );
+
+	// Enqueue search overlay script
+	wp_enqueue_script( 'kacosmetics-search', get_template_directory_uri() . '/js/search.js', array(), _S_VERSION, true );
+	wp_localize_script( 'kacosmetics-search', 'kacSearch', array(
+		'ajaxurl'     => admin_url( 'admin-ajax.php' ),
+		'noResults'   => __( 'No products found', 'kacosmetics' ),
+		'viewAll'     => __( 'View all results', 'kacosmetics' ),
+	) );
 
 	// Enqueue cookie consent script (GDPR compliance)
 	wp_enqueue_script( 'kacosmetics-cookie-consent', get_template_directory_uri() . '/js/cookie-consent.js', array(), _S_VERSION, true );
@@ -1934,6 +1954,52 @@ function kacosmetics_save_badge_field($post_id) {
  */
 add_action( 'wp_ajax_load_category_products', 'kac_load_category_products' );
 add_action( 'wp_ajax_nopriv_load_category_products', 'kac_load_category_products' );
+
+/**
+ * AJAX Search Autocomplete
+ */
+add_action( 'wp_ajax_kac_search_autocomplete', 'kac_search_autocomplete' );
+add_action( 'wp_ajax_nopriv_kac_search_autocomplete', 'kac_search_autocomplete' );
+
+function kac_search_autocomplete() {
+	$search_term = isset( $_GET['term'] ) ? sanitize_text_field( $_GET['term'] ) : '';
+
+	if ( strlen( $search_term ) < 2 ) {
+		wp_send_json( array() );
+	}
+
+	$args = array(
+		'post_type'      => 'product',
+		'post_status'    => 'publish',
+		's'              => $search_term,
+		'posts_per_page' => 6,
+	);
+
+	$products = new WP_Query( $args );
+	$results = array();
+
+	if ( $products->have_posts() ) {
+		while ( $products->have_posts() ) {
+			$products->the_post();
+			$product = wc_get_product( get_the_ID() );
+
+			if ( ! $product ) {
+				continue;
+			}
+
+			$results[] = array(
+				'id'        => get_the_ID(),
+				'title'     => get_the_title(),
+				'url'       => get_permalink(),
+				'image'     => get_the_post_thumbnail_url( get_the_ID(), 'thumbnail' ) ?: wc_placeholder_img_src( 'thumbnail' ),
+				'price'     => $product->get_price_html(),
+			);
+		}
+		wp_reset_postdata();
+	}
+
+	wp_send_json( $results );
+}
 
 function kac_load_category_products() {
     // Verify nonce
