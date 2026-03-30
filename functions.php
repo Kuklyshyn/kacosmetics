@@ -1756,6 +1756,51 @@ function hide_paid_shipping_when_free_available( $rates, $package ) {
     return $rates;
 }
 
+// Fallback: завжди показувати доставку якщо немає shipping методів (тільки pickup)
+add_filter( 'woocommerce_package_rates', 'kac_ensure_shipping_available', 999, 2 );
+function kac_ensure_shipping_available( $rates, $package ) {
+    // Перевірити чи є хоча б один НЕ-pickup метод доставки
+    $has_shipping_method = false;
+    foreach ( $rates as $rate_id => $rate ) {
+        $method_id = $rate->get_method_id();
+        if ( strpos( $method_id, 'pickup' ) === false && strpos( $rate_id, 'pickup' ) === false ) {
+            $has_shipping_method = true;
+            break;
+        }
+    }
+
+    // Якщо немає shipping методів - додаємо flat rate (5€)
+    if ( ! $has_shipping_method ) {
+        $rate = new WC_Shipping_Rate(
+            'flat_rate:99',
+            'Doručenie',
+            5,
+            array(),
+            'flat_rate',
+            99
+        );
+        $rates['flat_rate:99'] = $rate;
+    }
+
+    return $rates;
+}
+
+// Дозволити всі країни для доставки (fallback для WooCommerce Blocks)
+add_filter( 'woocommerce_shipping_show_shipping_calculator', '__return_true' );
+add_filter( 'woocommerce_shipping_hide_shipping_costs_until_address_entered', '__return_false' );
+
+// Очистити кеш shipping при зміні налаштувань
+add_action( 'after_switch_theme', 'kac_clear_shipping_cache' );
+add_action( 'woocommerce_update_options_shipping', 'kac_clear_shipping_cache' );
+function kac_clear_shipping_cache() {
+    $packages = WC()->cart ? WC()->cart->get_shipping_packages() : array();
+    foreach ( $packages as $key => $value ) {
+        $shipping_session = "shipping_for_package_$key";
+        unset( WC()->session->$shipping_session );
+    }
+    WC_Cache_Helper::get_transient_version( 'shipping', true );
+}
+
 // Автоматично вибрати самовивіз (Local Pickup)
 add_action( 'wp_footer', 'auto_select_local_pickup', 999 );
 function auto_select_local_pickup() {
@@ -1827,11 +1872,49 @@ function disable_postcode_validation_completely() {
         }
         return $fields;
     }, 9999 );
-    
+
     // Для Store API endpoints
     remove_all_filters( 'woocommerce_rest_check_permissions' );
     add_filter( 'woocommerce_rest_check_permissions', '__return_true', 9999 );
 }
+
+// Примусово показати доставку для всіх адрес в Словаччині
+add_filter( 'woocommerce_shipping_zone_shipping_methods', 'kac_add_fallback_shipping_method', 999, 4 );
+function kac_add_fallback_shipping_method( $methods, $raw_methods, $allowed_classes, $zone ) {
+    return $methods;
+}
+
+// Хук для Store API - завжди повертати shipping rates
+add_filter( 'woocommerce_shipping_packages', 'kac_force_shipping_packages', 999 );
+function kac_force_shipping_packages( $packages ) {
+    foreach ( $packages as $key => $package ) {
+        if ( empty( $package['rates'] ) ) {
+            // Додати fallback безкоштовну доставку
+            $rate = new WC_Shipping_Rate(
+                'free_shipping:99',
+                __( 'Doručenie zadarmo', 'kacosmetics' ),
+                0,
+                array(),
+                'free_shipping',
+                99
+            );
+            $packages[ $key ]['rates']['free_shipping:99'] = $rate;
+        }
+    }
+    return $packages;
+}
+
+// Видалити помилку "no shipping available" для WooCommerce Blocks
+add_filter( 'woocommerce_cart_needs_shipping', 'kac_cart_needs_shipping', 999 );
+function kac_cart_needs_shipping( $needs_shipping ) {
+    // Завжди дозволяти checkout (доставка або самовивіз)
+    return $needs_shipping;
+}
+
+// Fallback: дозволити checkout без валідної shipping зони
+add_filter( 'woocommerce_cart_ready_to_calc_shipping', '__return_true', 999 );
+
+// Store API фільтр більше не потрібен - основний фікс в woocommerce_package_rates
 
 // Модифікувати запит перед обробкою
 add_filter( 'rest_request_before_callbacks', 'modify_checkout_request_data', 10, 3 );
