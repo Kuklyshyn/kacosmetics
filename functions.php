@@ -1485,12 +1485,12 @@ add_action('init', 'kac_flush_contact_page_rewrite');
 function kac_get_contact_page_url() {
 	// Try to find contact page
 	$contact_page = get_page_by_path('contact');
-	
+
 	if (!$contact_page) {
 		// Fallback to kac_url
 		return kac_url('contact/');
 	}
-	
+
 	// Get translated version if Polylang is active
 	if (function_exists('pll_get_post')) {
 		$translated_id = pll_get_post($contact_page->ID);
@@ -1498,8 +1498,50 @@ function kac_get_contact_page_url() {
 			return get_permalink($translated_id);
 		}
 	}
-	
+
 	return get_permalink($contact_page->ID);
+}
+
+/**
+ * Get Brands Page URL with Polylang support
+ */
+function kac_get_brands_page_url() {
+	// Try to find brands page by slug (Slovak version)
+	$brands_page = get_page_by_path('brands');
+
+	// If not found, try Ukrainian version
+	if (!$brands_page) {
+		$brands_page = get_page_by_path('brands-ua');
+	}
+
+	// Fallback: find page by template
+	if (!$brands_page) {
+		$pages = get_posts(array(
+			'post_type' => 'page',
+			'meta_key' => '_wp_page_template',
+			'meta_value' => 'page-brands.php',
+			'posts_per_page' => 1,
+			'suppress_filters' => false,
+		));
+		if (!empty($pages)) {
+			$brands_page = $pages[0];
+		}
+	}
+
+	if (!$brands_page) {
+		// Ultimate fallback
+		return home_url('/brands/');
+	}
+
+	// Get translated version if Polylang is active
+	if (function_exists('pll_get_post')) {
+		$translated_id = pll_get_post($brands_page->ID);
+		if ($translated_id) {
+			return get_permalink($translated_id);
+		}
+	}
+
+	return get_permalink($brands_page->ID);
 }
 
 /**

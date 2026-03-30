@@ -53,7 +53,7 @@
 			<div class="mobile-menu-section">
 				<ul>
 					<li><a href="<?php echo esc_url(wc_get_page_permalink('shop')); ?>"><?php esc_html_e('Shop', 'kacosmetics'); ?></a></li>
-					<li><a href="<?php echo kac_url('brands/'); ?>"><?php esc_html_e('Brands', 'kacosmetics'); ?></a></li>
+					<li><a href="<?php echo esc_url(kac_get_brands_page_url()); ?>"><?php esc_html_e('Brands', 'kacosmetics'); ?></a></li>
 				</ul>
 
 				<h3 style="margin-top: 20px;"><?php esc_html_e('Categories', 'kacosmetics'); ?></h3>
