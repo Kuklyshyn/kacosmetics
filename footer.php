@@ -91,11 +91,16 @@ $footer_categories = get_terms(array(
             <div class="footer-column">
                 <h4 class="footer-title"><?php esc_html_e('Customer Service', 'kacosmetics'); ?></h4>
                 <ul class="footer-links">
-                    <li><a href="<?php echo esc_url(kac_get_contact_page_url()); ?>"><?php esc_html_e('Refunds Form', 'kacosmetics'); ?></a></li>
+                    
                     <li><a href="<?php echo esc_url(kac_get_legal_page_url('kacosmetics_vop_page')); ?>"><?php esc_html_e('Vop', 'kacosmetics'); ?></a></li>
-                    <li><a href="<?php echo esc_url(kac_get_legal_page_url('kacosmetics_terms_page')); ?>"><?php esc_html_e('Terms & Conditions', 'kacosmetics'); ?></a></li>
-                    <li><a href="<?php echo esc_url(kac_get_legal_page_url('kacosmetics_shipping_page')); ?>"><?php esc_html_e('Shipping & Delivery', 'kacosmetics'); ?></a></li>
                     <li><a href="<?php echo esc_url(kac_get_legal_page_url('kacosmetics_returns_page')); ?>"><?php esc_html_e('Returns & Refunds', 'kacosmetics'); ?></a></li>
+
+                    <li><a href="<?php echo esc_url(kac_get_legal_page_url('kacosmetics_cookie_page')); ?>"><?php esc_html_e('Cookies Policy', 'kacosmetics'); ?></a></li>
+                    <li><a href="<?php echo esc_url(kac_get_legal_page_url('kacosmetics_shipping_page')); ?>"><?php esc_html_e('Shipping & Delivery', 'kacosmetics'); ?></a></li>
+                    
+                    <li><a href="<?php echo esc_url(kac_get_legal_page_url('kacosmetics_terms_page')); ?>"><?php esc_html_e('Terms & Conditions', 'kacosmetics'); ?></a></li>
+                    
+                    <li><a href="<?php echo esc_url(kac_get_contact_page_url()); ?>"><?php esc_html_e('Refunds Form', 'kacosmetics'); ?></a></li>
                     <li><a href="<?php echo esc_url(kac_get_legal_page_url('kacosmetics_faq_page')); ?>"><?php esc_html_e('FAQ', 'kacosmetics'); ?></a></li>
                     <li><a href="<?php echo esc_url(wc_get_page_permalink('myaccount')); ?>"><?php esc_html_e('My Account', 'kacosmetics'); ?></a></li>
                 </ul>

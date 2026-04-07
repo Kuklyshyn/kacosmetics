@@ -342,6 +342,7 @@ function kac_custom_translations( $translated, $text, $domain ) {
 				// Footer
 				'Customer Service'   => 'Обслуговування клієнтів',
 				'Contact Us'         => 'Зв\'язатися з нами',
+				'Cookies Policy'     => 'Політика конфіденційності',
 				'Refunds Form'       => 'Форма повернення',
 				'Vop'                => 'Відповідальність за контент',
 				'Privacy Policy'     => 'Політика конфіденційності',
@@ -413,6 +414,7 @@ function kac_custom_translations( $translated, $text, $domain ) {
 				'Customer Service'   => 'Zákaznícky servis',
 				'Contact Us'         => 'Kontaktujte nás',
 				'Refunds Form'       => 'Reklamačný formulár',
+				'Cookies Policy'            => 'Poučenie o ochrane osobných údajov a používaní cookies',
 				'Vop'                => 'Všeobecné obchodné podmienky',
 				'Privacy Policy'     => 'Ochrana súkromia',
 				'Terms & Conditions' => 'Ochrana osobných údajov',
@@ -1304,6 +1306,18 @@ function kacosmetics_legal_pages_customizer($wp_customize) {
 
 	$wp_customize->add_control('kacosmetics_vop_page', array(
 		'label' => __('Vop', 'kacosmetics'),
+		'section' => 'kacosmetics_legal_pages',
+		'type' => 'dropdown-pages',
+	));
+
+	// cookie Page
+	$wp_customize->add_setting('kacosmetics_cookie_page', array(
+		'default' => '',
+		'sanitize_callback' => 'absint',
+	));
+
+	$wp_customize->add_control('kacosmetics_cookie_page', array(
+		'label' => __('Cookies Policy', 'kacosmetics'),
 		'section' => 'kacosmetics_legal_pages',
 		'type' => 'dropdown-pages',
 	));
