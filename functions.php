@@ -1365,6 +1365,17 @@ function kacosmetics_legal_pages_customizer($wp_customize) {
 		'section' => 'kacosmetics_legal_pages',
 		'type' => 'dropdown-pages',
 	));
+
+	// Reklamačný formulár Page
+	$wp_customize->add_setting('kacosmetics_returns_form_page', array(
+		'default' => '',
+		'sanitize_callback' => 'absint',
+	));
+	$wp_customize->add_control('kacosmetics_returns_form_page', array(
+		'label' => __('Refunds Form', 'kacosmetics'),
+		'section' => 'kacosmetics_legal_pages',
+		'type' => 'dropdown-pages',
+	));
 }
 add_action('customize_register', 'kacosmetics_legal_pages_customizer');
 

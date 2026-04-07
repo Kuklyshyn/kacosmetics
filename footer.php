@@ -99,8 +99,8 @@ $footer_categories = get_terms(array(
                     <li><a href="<?php echo esc_url(kac_get_legal_page_url('kacosmetics_shipping_page')); ?>"><?php esc_html_e('Shipping & Delivery', 'kacosmetics'); ?></a></li>
                     
                     <li><a href="<?php echo esc_url(kac_get_legal_page_url('kacosmetics_terms_page')); ?>"><?php esc_html_e('Terms & Conditions', 'kacosmetics'); ?></a></li>
+                    <li><a href="<?php echo esc_url(kac_get_legal_page_url('kacosmetics_returns_form_page')); ?>"><?php esc_html_e('Refunds Form', 'kacosmetics'); ?></a></li>
                     
-                    <li><a href="<?php echo esc_url(kac_get_contact_page_url()); ?>"><?php esc_html_e('Refunds Form', 'kacosmetics'); ?></a></li>
                     <li><a href="<?php echo esc_url(kac_get_legal_page_url('kacosmetics_faq_page')); ?>"><?php esc_html_e('FAQ', 'kacosmetics'); ?></a></li>
                     <li><a href="<?php echo esc_url(wc_get_page_permalink('myaccount')); ?>"><?php esc_html_e('My Account', 'kacosmetics'); ?></a></li>
                 </ul>
