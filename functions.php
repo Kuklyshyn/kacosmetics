@@ -342,9 +342,11 @@ function kac_custom_translations( $translated, $text, $domain ) {
 				// Footer
 				'Customer Service'   => 'Обслуговування клієнтів',
 				'Contact Us'         => 'Зв\'язатися з нами',
+				'Refunds Form'       => 'Форма повернення',
+				'Vop'                => 'Відповідальність за контент',
 				'Privacy Policy'     => 'Політика конфіденційності',
 				'Terms & Conditions' => 'Умови використання',
-				'Shipping & Delivery' => 'Доставка',
+				'Shipping & Delivery' => 'Умови доставки',
 				'Returns & Refunds'  => 'Повернення та обмін',
 				'My Account'         => 'Мій акаунт',
 				'Contact'            => 'Контакти',
@@ -410,10 +412,12 @@ function kac_custom_translations( $translated, $text, $domain ) {
 				// Footer
 				'Customer Service'   => 'Zákaznícky servis',
 				'Contact Us'         => 'Kontaktujte nás',
+				'Refunds Form'       => 'Reklamačný formulár',
+				'Vop'                => 'Všeobecné obchodné podmienky',
 				'Privacy Policy'     => 'Ochrana súkromia',
-				'Terms & Conditions' => 'Obchodné podmienky',
-				'Shipping & Delivery' => 'Doprava a doručenie',
-				'Returns & Refunds'  => 'Vrátenie a výmena',
+				'Terms & Conditions' => 'Ochrana osobných údajov',
+				'Shipping & Delivery' => 'Formulár odstúpenie od zmluvy',
+				'Returns & Refunds'  => 'Reklamačný poriadok',
 				'My Account'         => 'Môj účet',
 				'Contact'            => 'Kontakt',
 				'Secure Payment:'    => 'Bezpečná platba:',
@@ -1292,13 +1296,14 @@ function kacosmetics_legal_pages_customizer($wp_customize) {
 		'description' => __('Select pages for legal links in footer', 'kacosmetics'),
 	));
 
-	// Privacy Policy Page
-	$wp_customize->add_setting('kacosmetics_privacy_page', array(
+	// vop Page
+	$wp_customize->add_setting('kacosmetics_vop_page', array(
 		'default' => '',
 		'sanitize_callback' => 'absint',
 	));
-	$wp_customize->add_control('kacosmetics_privacy_page', array(
-		'label' => __('Privacy Policy Page', 'kacosmetics'),
+
+	$wp_customize->add_control('kacosmetics_vop_page', array(
+		'label' => __('Vop', 'kacosmetics'),
 		'section' => 'kacosmetics_legal_pages',
 		'type' => 'dropdown-pages',
 	));
