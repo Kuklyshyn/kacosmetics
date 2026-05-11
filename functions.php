@@ -238,7 +238,7 @@ add_filter( 'term_link', 'kac_fix_brand_term_link', 999, 3 );
  * Flush rewrite rules when needed
  */
 function kac_fix_brand_rewrite_rules() {
-	$version = '2'; // Increment this to force flush again
+	$version = '3'; // Increment this to force flush again
 	$current_version = get_option( 'kac_brand_slug_version' );
 
 	// Flush if version changed
@@ -253,6 +253,38 @@ function kac_fix_brand_rewrite_rules() {
 	}
 }
 add_action( 'admin_init', 'kac_fix_brand_rewrite_rules' );
+
+/**
+ * Prevent WordPress canonical redirect for brand URLs
+ * Without this, WordPress may redirect /brands/slug/ to a product page
+ */
+function kac_prevent_brand_redirect( $redirect_url, $requested_url ) {
+	if ( preg_match( '#/brands/([^/]+)/?$#', $_SERVER['REQUEST_URI'], $matches ) ) {
+		$slug = $matches[1];
+		$brand = get_term_by( 'slug', $slug, 'product_brand' );
+		if ( $brand && ! is_wp_error( $brand ) ) {
+			return false; // Cancel the redirect
+		}
+	}
+	return $redirect_url;
+}
+add_filter( 'redirect_canonical', 'kac_prevent_brand_redirect', 10, 2 );
+
+/**
+ * Set up proper query vars for brand URLs so WordPress recognizes them
+ */
+function kac_brand_parse_request( $wp ) {
+	if ( preg_match( '#/brands/([^/]+)/?$#', $_SERVER['REQUEST_URI'], $matches ) ) {
+		$slug = $matches[1];
+		$brand = get_term_by( 'slug', $slug, 'product_brand' );
+		if ( $brand && ! is_wp_error( $brand ) ) {
+			$wp->query_vars['product_brand'] = $slug;
+			$wp->query_vars['taxonomy'] = 'product_brand';
+			$wp->query_vars['term'] = $slug;
+		}
+	}
+}
+add_action( 'parse_request', 'kac_brand_parse_request', 1 );
 
 /**
  * Make sure brand taxonomy template is loaded correctly
